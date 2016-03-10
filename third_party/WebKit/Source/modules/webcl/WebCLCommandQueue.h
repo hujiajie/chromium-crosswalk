@@ -10,8 +10,10 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
 #include "platform/heap/Handle.h"
+#include <wtf/HashSet.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
 
 namespace blink {
@@ -88,6 +90,8 @@ public:
     void finishCommandQueues(SyncMethod);
     unsigned getProperties();
     bool isReleased() const { return !m_clCommandQueue; }
+    void enqueueEvent(PassRefPtr<WebCLEvent>);
+    void dequeueEvent(WebCLEvent*);
 
 private:
     void enqueueWriteBufferBase(WebCLBuffer*, bool, unsigned, unsigned, void*, size_t, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
@@ -108,6 +112,7 @@ private:
     cl_event m_eventForCallback;
     WebCLDevice* m_device;
     cl_command_queue m_clCommandQueue;
+    HashSet<RefPtr<WebCLEvent>> m_eventList;
 };
 
 } // namespace blink

@@ -1306,4 +1306,14 @@ void WebCLCommandQueue::resetEventAndCallback()
     m_whenFinishCallback.clear();
 }
 
+void WebCLCommandQueue::enqueueEvent(PassRefPtr<WebCLEvent> event)
+{
+    m_eventList.add(event);
+}
+
+void WebCLCommandQueue::dequeueEvent(WebCLEvent* event)
+{
+    m_eventList.remove(event);
+}
+
 } // namespace blink
