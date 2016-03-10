@@ -239,4 +239,18 @@ void WebCLEvent::setCommandDataHolder(PassOwnPtr<WebCLCommandDataHolder> data)
     m_commandDataHolder = data;
 }
 
+void WebCLEvent::didRunCallback(WebCLCallback* callback)
+{
+    size_t i = m_callbacks.find(callback);
+    ASSERT(i != kNotFound);
+    m_callbacks.remove(i);
+
+    if (!m_callbacks.size()) {
+        // All callbacks have been handled, notify the associated command queue
+        // to unhold this event.
+        m_commandQueue->dequeueEvent(this);
+        // |this| is dead here.
+    }
+}
+
 } // namespace blink

@@ -41,6 +41,7 @@ public:
     cl_event getEvent() { return m_clEvent; }
     bool isReleased() const { return !m_clEvent; }
     void setCommandDataHolder(PassOwnPtr<WebCLCommandDataHolder>);
+    void didRunCallback(WebCLCallback*);
 
 protected:
     WebCLEvent(cl_event);
