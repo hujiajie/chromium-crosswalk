@@ -1627,6 +1627,8 @@
       'webcl/WebCLBuffer.cpp',
       'webcl/WebCLBuffer.h',
       'webcl/WebCLCallback.h',
+      'webcl/WebCLCommandDataHolder.cpp',
+      'webcl/WebCLCommandDataHolder.h',
       'webcl/WebCLCommandQueue.cpp',
       'webcl/WebCLCommandQueue.h',
       'webcl/WebCLConfig.h',
