@@ -10,12 +10,15 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
 
+#include <wtf/OwnPtr.h>
+#include <wtf/PassOwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
 namespace blink {
 
 class WebCL;
+class WebCLCommandDataHolder;
 class WebCLCommandQueue;
 class WebCLEventHolder;
 class ExceptionState;
@@ -37,6 +40,7 @@ public:
     cl_event* getEventPtr() { return &m_clEvent; }
     cl_event getEvent() { return m_clEvent; }
     bool isReleased() const { return !m_clEvent; }
+    void setCommandDataHolder(PassOwnPtr<WebCLCommandDataHolder>);
 
 protected:
     WebCLEvent(cl_event);
@@ -47,6 +51,7 @@ protected:
     Vector<RefPtr<WebCLCallback>> m_callbacks;
     WebCLCommandQueue* m_commandQueue;
     cl_event m_clEvent;
+    OwnPtr<WebCLCommandDataHolder> m_commandDataHolder;
 };
 
 } // namespace blink

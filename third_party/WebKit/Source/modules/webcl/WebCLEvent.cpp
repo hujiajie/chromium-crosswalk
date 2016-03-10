@@ -7,6 +7,7 @@
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
+#include "modules/webcl/WebCLCommandDataHolder.h"
 #include "modules/webcl/WebCLEvent.h"
 #include "modules/webcl/WebCLOpenCL.h"
 #include "platform/ThreadSafeFunctional.h"
@@ -231,6 +232,11 @@ void WebCLEvent::callbackProxyOnMainThread(PassOwnPtr<WebCLEventHolder> holder)
         callback->handleEvent();
 
     webEvent->m_callbacks.clear();
+}
+
+void WebCLEvent::setCommandDataHolder(PassOwnPtr<WebCLCommandDataHolder> data)
+{
+    m_commandDataHolder = data;
 }
 
 } // namespace blink
