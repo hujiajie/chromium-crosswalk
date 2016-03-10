@@ -9,7 +9,7 @@
 #include "modules/webcl/WebCLCallback.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
-
+#include "platform/heap/Handle.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/Threading.h>
@@ -41,10 +41,10 @@ public:
     static PassRefPtr<WebCLCommandQueue> create(cl_command_queue, PassRefPtr<WebCLContext>, WebCLDevice*);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
-    void enqueueWriteBuffer(WebCLBuffer*, bool, unsigned, unsigned, DOMArrayBufferView*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
-    void enqueueWriteBuffer(WebCLBuffer*, bool, unsigned, ImageData*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
-    void enqueueWriteBuffer(WebCLBuffer*, bool, unsigned, HTMLCanvasElement*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
-    void enqueueWriteBuffer(WebCLBuffer*, bool, unsigned, HTMLImageElement*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
+    void enqueueWriteBuffer(PassRefPtr<WebCLBuffer>, bool, unsigned, unsigned, PassRefPtr<DOMArrayBufferView>, const Vector<RefPtr<WebCLEvent>>&, PassRefPtr<WebCLEvent>, ExceptionState&);
+    void enqueueWriteBuffer(PassRefPtr<WebCLBuffer>, bool, unsigned, ImageData*, const Vector<RefPtr<WebCLEvent>>&, PassRefPtr<WebCLEvent>, ExceptionState&);
+    void enqueueWriteBuffer(PassRefPtr<WebCLBuffer>, bool, unsigned, PassRefPtrWillBeRawPtr<HTMLCanvasElement>, const Vector<RefPtr<WebCLEvent>>&, PassRefPtr<WebCLEvent>, ExceptionState&);
+    void enqueueWriteBuffer(PassRefPtr<WebCLBuffer>, bool, unsigned, PassRefPtrWillBeRawPtr<HTMLImageElement>, const Vector<RefPtr<WebCLEvent>>&, PassRefPtr<WebCLEvent>, ExceptionState&);
 
     void enqueueWriteBufferRect(WebCLBuffer*, bool, const Vector<unsigned>&, const Vector<unsigned>&, const Vector<unsigned>&, unsigned, unsigned, unsigned, unsigned, DOMArrayBufferView*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
     void enqueueWriteBufferRect(WebCLBuffer*, bool, const Vector<unsigned>&, const Vector<unsigned>&, const Vector<unsigned>&, unsigned, unsigned, ImageData*, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);

@@ -247,16 +247,16 @@ void WebCLCommandQueue::enqueueWriteBufferBase(WebCLBuffer* mem, bool blockingWr
         WebCLException::throwException(err, es);
 }
 
-void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* mem, bool blockingWrite, unsigned offset, unsigned bufferSize, DOMArrayBufferView* ptr, const Vector<RefPtr<WebCLEvent>>& events, WebCLEvent* event, ExceptionState& es)
+void WebCLCommandQueue::enqueueWriteBuffer(PassRefPtr<WebCLBuffer> mem, bool blockingWrite, unsigned offset, unsigned bufferSize, PassRefPtr<DOMArrayBufferView> ptr, const Vector<RefPtr<WebCLEvent>>& events, PassRefPtr<WebCLEvent> event, ExceptionState& es)
 {
-    if (!ptr || !WebCLInputChecker::isValidDataSizeForDOMArrayBufferView(bufferSize, ptr)) {
+    if (!ptr || !WebCLInputChecker::isValidDataSizeForDOMArrayBufferView(bufferSize, ptr.get())) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
-    enqueueWriteBufferBase(mem, blockingWrite, offset, bufferSize, ptr->baseAddress(), ptr->byteLength(), events, event, es);
+    enqueueWriteBufferBase(mem.get(), blockingWrite, offset, bufferSize, ptr->baseAddress(), ptr->byteLength(), events, event.get(), es);
 }
 
-void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWrite, unsigned offset, ImageData* srcPixels, const Vector<RefPtr<WebCLEvent>>& events, WebCLEvent* event, ExceptionState& es)
+void WebCLCommandQueue::enqueueWriteBuffer(PassRefPtr<WebCLBuffer> buffer, bool blockingWrite, unsigned offset, ImageData* srcPixels, const Vector<RefPtr<WebCLEvent>>& events, PassRefPtr<WebCLEvent> event, ExceptionState& es)
 {
     if (!isExtensionEnabled(context().get(), "WEBCL_html_image")) {
         es.throwWebCLException(WebCLException::EXTENSION_NOT_ENABLED, WebCLException::extensionNotEnabledMessage);
@@ -268,10 +268,10 @@ void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWri
     if (!WebCLHTMLUtil::extractDataFromImageData(srcPixels, hostPtr, pixelSize, es))
         return;
 
-    enqueueWriteBufferBase(buffer, blockingWrite, offset, pixelSize, hostPtr, pixelSize, events, event, es);
+    enqueueWriteBufferBase(buffer.get(), blockingWrite, offset, pixelSize, hostPtr, pixelSize, events, event.get(), es);
 }
 
-void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWrite, unsigned offset, HTMLCanvasElement* srcCanvas, const Vector<RefPtr<WebCLEvent>>& events, WebCLEvent* event, ExceptionState& es)
+void WebCLCommandQueue::enqueueWriteBuffer(PassRefPtr<WebCLBuffer> buffer, bool blockingWrite, unsigned offset, PassRefPtrWillBeRawPtr<HTMLCanvasElement> srcCanvas, const Vector<RefPtr<WebCLEvent>>& events, PassRefPtr<WebCLEvent> event, ExceptionState& es)
 {
     if (!isExtensionEnabled(context().get(), "WEBCL_html_image")) {
         es.throwWebCLException(WebCLException::EXTENSION_NOT_ENABLED, WebCLException::extensionNotEnabledMessage);
@@ -280,14 +280,14 @@ void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWri
 
     Vector<uint8_t> data;
     size_t canvasSize = 0;
-    if (!WebCLHTMLUtil::extractDataFromCanvas(srcCanvas, data, canvasSize, es))
+    if (!WebCLHTMLUtil::extractDataFromCanvas(srcCanvas.get(), data, canvasSize, es))
         return;
 
     void* hostPtr = data.data();
-    enqueueWriteBufferBase(buffer, blockingWrite, offset, canvasSize, hostPtr, canvasSize, events, event, es);
+    enqueueWriteBufferBase(buffer.get(), blockingWrite, offset, canvasSize, hostPtr, canvasSize, events, event.get(), es);
 }
 
-void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWrite, unsigned offset, HTMLImageElement* srcImage, const Vector<RefPtr<WebCLEvent>>& events, WebCLEvent* event, ExceptionState& es)
+void WebCLCommandQueue::enqueueWriteBuffer(PassRefPtr<WebCLBuffer> buffer, bool blockingWrite, unsigned offset, PassRefPtrWillBeRawPtr<HTMLImageElement> srcImage, const Vector<RefPtr<WebCLEvent>>& events, PassRefPtr<WebCLEvent> event, ExceptionState& es)
 {
     if (!isExtensionEnabled(context().get(), "WEBCL_html_image")) {
         es.throwWebCLException(WebCLException::EXTENSION_NOT_ENABLED, WebCLException::extensionNotEnabledMessage);
@@ -296,11 +296,11 @@ void WebCLCommandQueue::enqueueWriteBuffer(WebCLBuffer* buffer, bool blockingWri
 
     Vector<uint8_t> data;
     size_t imageSize = 0;
-    if (!WebCLHTMLUtil::extractDataFromImage(srcImage, data, imageSize, es))
+    if (!WebCLHTMLUtil::extractDataFromImage(srcImage.get(), data, imageSize, es))
         return;
 
     void* hostPtr = data.data();
-    enqueueWriteBufferBase(buffer, blockingWrite, offset, imageSize, hostPtr, imageSize, events, event, es);
+    enqueueWriteBufferBase(buffer.get(), blockingWrite, offset, imageSize, hostPtr, imageSize, events, event.get(), es);
 }
 
 void WebCLCommandQueue::enqueueWriteBufferRectBase(WebCLBuffer* mem, bool blockingWrite, const Vector<unsigned>& bufferOrigin, const Vector<unsigned>& hostOrigin, const Vector<unsigned>& region, unsigned bufferRowPitch, unsigned bufferSlicePitch, unsigned hostRowPitch, unsigned hostSlicePitch, void* ptr, size_t ptrLength, const Vector<RefPtr<WebCLEvent>>& events, WebCLEvent* event, ExceptionState& es)
