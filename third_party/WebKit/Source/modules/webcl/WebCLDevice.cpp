@@ -457,6 +457,58 @@ void WebCLDevice::getEnabledExtensions(HashSet<String>& extensions)
     m_extension.getEnabledExtensions(extensions);
 }
 
+int WebCLDevice::getAsSpecialInfo(String& info, unsigned name)
+{
+    switch (name) {
+    case CL_DEVICE_PROFILE:
+        info = "WEBCL_PROFILE";
+        return WebCLException::SUCCESS;
+    case CL_DEVICE_VERSION:
+        info = "WebCL 1.0";
+        return WebCLException::SUCCESS;
+    case CL_DEVICE_OPENCL_C_VERSION:
+        info = "WebCL C 1.0";
+        return WebCLException::SUCCESS;
+    default:
+        return WebCLException::INVALID_VALUE;
+    }
+}
+
+int WebCLDevice::getAsSpecialInfo(RefPtr<WebCLPlatform>& info, unsigned name)
+{
+    if (name != CL_DEVICE_PLATFORM)
+        return WebCLException::INVALID_VALUE;
+    info = m_platform;
+    return WebCLException::SUCCESS;
+}
+
+int WebCLDevice::getAsOrdinaryInfo(String& info, unsigned name)
+{
+    int status;
+    size_t expectedSizeInBytes = sizeof(char);
+    size_t actualSizeInBytes;
+    size_t maxSizeInBytes = UINT_MAX;
+
+    do {
+        status = clGetDeviceInfo(m_clDeviceId, name, expectedSizeInBytes, nullptr, &actualSizeInBytes);
+        if (status != WebCLException::SUCCESS)
+            return status;
+        if (actualSizeInBytes < expectedSizeInBytes || expectedSizeInBytes == maxSizeInBytes)
+            break;
+        if (expectedSizeInBytes <= maxSizeInBytes / 2)
+            expectedSizeInBytes *= 2;
+        else
+            expectedSizeInBytes = maxSizeInBytes;
+    } while (true);
+
+    char* stringInfo = new char[actualSizeInBytes / sizeof(char)];
+    status = clGetDeviceInfo(m_clDeviceId, name, actualSizeInBytes, stringInfo, nullptr);
+    if (status == WebCLException::SUCCESS)
+        info = stringInfo;
+    delete [] stringInfo;
+    return status;
+}
+
 WebCLDevice::WebCLDevice(cl_device_id device, WebCLPlatform* platform)
     : m_platform(platform)
     , m_clDeviceId(device)
