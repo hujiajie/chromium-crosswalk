@@ -33,13 +33,6 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-unsigned WebCLDevice::getMaxWorkGroup()
-{
-    size_t sizetUnits = 0;
-    clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &sizetUnits, nullptr);
-    return static_cast<unsigned>(sizetUnits);
-}
-
 Vector<unsigned> WebCLDevice::getMaxWorkItem()
 {
     size_t sizetUnits = 0;
@@ -245,8 +238,8 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
         break;
     case CL_DEVICE_MAX_WORK_GROUP_SIZE: {
-        unsigned result  = getMaxWorkGroup();
-        if (result)
+        unsigned result  = getInfo<size_t>(CL_DEVICE_MAX_WORK_GROUP_SIZE, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
         break;
     }
