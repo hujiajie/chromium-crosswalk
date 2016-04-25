@@ -716,7 +716,11 @@ void WebCLCommandQueue::enqueueNDRangeKernel(WebCLKernel* kernel, unsigned dim, 
         es.clearException();
         maxWorkGroupSize = 0;
     }
-    Vector<unsigned> maxWorkItemSizes = m_device->getMaxWorkItem();
+    Vector<size_t> maxWorkItemSizes = m_device->getInfo<Vector<size_t>>(CL_DEVICE_MAX_WORK_ITEM_SIZES, es);
+    if (es.hadException()) {
+        es.clearException();
+        maxWorkItemSizes.clear();
+    }
     unsigned total = 1;
     for (unsigned i = 0; maxWorkItemSizes.size() == localWorkSize.size() && i < localWorkSize.size(); i ++) {
         if (localWorkSize[i] > maxWorkItemSizes[i]) {

@@ -33,23 +33,6 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-Vector<unsigned> WebCLDevice::getMaxWorkItem()
-{
-    size_t sizetUnits = 0;
-    size_t sizetArray[3] = {0};
-    cl_int err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(size_t), &sizetUnits, nullptr);
-    if (err == CL_SUCCESS) {
-       err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(sizetArray), &sizetArray, nullptr);
-       if (err == CL_SUCCESS) {
-           Vector<unsigned> values;
-           for (unsigned i = 0; i < static_cast<unsigned>(sizetUnits); ++i)
-               values.append(static_cast<unsigned>(sizetArray[i]));
-           return values;
-       }
-    }
-    return Vector<unsigned>();
-}
-
 ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, ExceptionState& es)
 {
     v8::Handle<v8::Object> creationContext = scriptState->context()->Global();
@@ -244,8 +227,8 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
         break;
     }
     case CL_DEVICE_MAX_WORK_ITEM_SIZES: {
-        Vector<unsigned> result = getMaxWorkItem();
-        if (result.size())
+        Vector<size_t> result = getInfo<Vector<size_t>>(CL_DEVICE_MAX_WORK_ITEM_SIZES, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, toV8(result, creationContext, isolate));
         break;
     }
