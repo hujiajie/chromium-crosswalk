@@ -38,8 +38,6 @@ public:
     bool enableExtension(const String& name);
     void getEnabledExtensions(HashSet<String>& extensions);
     Vector<String> getSupportedExtensions();
-    unsigned getImage2DMaxWidth();
-    unsigned getImage2DMaxHeight();
     unsigned getMaxWorkGroup();
     Vector<unsigned> getMaxWorkItem();
     PassRefPtr<WebCLPlatform> getPlatform() const { return m_platform; }

@@ -33,20 +33,6 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-unsigned WebCLDevice::getImage2DMaxWidth()
-{
-    size_t sizetUnits = 0;
-    clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &sizetUnits, nullptr);
-    return static_cast<unsigned>(sizetUnits);
-}
-
-unsigned WebCLDevice::getImage2DMaxHeight()
-{
-    size_t sizetUnits = 0;
-    clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &sizetUnits, nullptr);
-    return static_cast<unsigned>(sizetUnits);
-}
-
 unsigned WebCLDevice::getMaxWorkGroup()
 {
     size_t sizetUnits = 0;
@@ -227,14 +213,14 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
         break;
     case CL_DEVICE_IMAGE2D_MAX_HEIGHT: {
-        unsigned result = getImage2DMaxHeight();
-        if (result)
+        unsigned result = getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
         break;
     }
     case CL_DEVICE_IMAGE2D_MAX_WIDTH: {
-        unsigned result = getImage2DMaxWidth();
-        if (result)
+        unsigned result = getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
         break;
     }

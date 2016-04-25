@@ -708,8 +708,16 @@ bool WebCLContext::supportsWidthHeight(unsigned width, unsigned height, Exceptio
     if (m_devices.size() && !m_deviceMaxValues.size()) {
         unsigned deviceMaxWidth = 0, deviceMaxHeight = 0;
         for (auto device : m_devices) {
-            deviceMaxWidth = device->getImage2DMaxWidth();
-            deviceMaxHeight = device->getImage2DMaxHeight();
+            deviceMaxWidth = device->getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH, es);
+            if (es.hadException()) {
+                es.clearException();
+                deviceMaxWidth = 0;
+            }
+            deviceMaxHeight = device->getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT, es);
+            if (es.hadException()) {
+                es.clearException();
+                deviceMaxHeight = 0;
+            }
             if (deviceMaxWidth && deviceMaxHeight)
                 m_deviceMaxValues.add(device.get(), std::make_pair(deviceMaxWidth, deviceMaxHeight));
         }
