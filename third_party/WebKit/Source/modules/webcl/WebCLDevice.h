@@ -38,7 +38,6 @@ public:
     bool enableExtension(const String& name);
     void getEnabledExtensions(HashSet<String>& extensions);
     Vector<String> getSupportedExtensions();
-    unsigned long long getMaxMemAllocSize();
     unsigned getImage2DMaxWidth();
     unsigned getImage2DMaxHeight();
     unsigned getMaxWorkGroup();

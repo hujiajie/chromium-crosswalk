@@ -33,13 +33,6 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-unsigned long long WebCLDevice::getMaxMemAllocSize()
-{
-    cl_ulong ulongUnits = 0;
-    clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-    return static_cast<unsigned long long>(ulongUnits);
-}
-
 unsigned WebCLDevice::getImage2DMaxWidth()
 {
     size_t sizetUnits = 0;
@@ -298,8 +291,8 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
         break;
     case CL_DEVICE_MAX_MEM_ALLOC_SIZE: {
-        unsigned long long result = getMaxMemAllocSize();
-        if (result)
+        unsigned long long result = getInfo<cl_ulong>(CL_DEVICE_MAX_MEM_ALLOC_SIZE, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
         break;
     }

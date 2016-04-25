@@ -277,7 +277,11 @@ PassRefPtr<WebCLBuffer> WebCLContext::createBufferBase(unsigned memFlags, unsign
 
     unsigned num = 0 ;
     for (size_t i = 0; i < m_devices.size(); ++i) {
-        unsigned maxMemAllocSize = m_devices[i]->getMaxMemAllocSize();
+        unsigned maxMemAllocSize = m_devices[i]->getInfo<cl_ulong>(CL_DEVICE_MAX_MEM_ALLOC_SIZE, es);
+        if (es.hadException()) {
+            es.clearException();
+            maxMemAllocSize = 0;
+        }
         if (maxMemAllocSize && maxMemAllocSize < sizeInBytes) {
             num++;
         }
