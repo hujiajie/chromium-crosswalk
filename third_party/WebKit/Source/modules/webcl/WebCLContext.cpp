@@ -81,7 +81,11 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* devi
     // NOTE: if device is null, it will be selected by any WebCLDevice that matches Properties
     if (!device) {
         for (auto deviceItem : m_devices) {
-            unsigned properties = deviceItem->getQueueProperties();
+            unsigned properties = deviceItem->getInfo<cl_command_queue_properties>(CL_DEVICE_QUEUE_PROPERTIES, es);
+            if (es.hadException()) {
+                es.clearException();
+                properties = 0;
+            }
             if (!commandQueueProp || (properties && (properties & commandQueueProp))) {
                 device = deviceItem.get();
                 clDevice = deviceItem->getDeviceId();

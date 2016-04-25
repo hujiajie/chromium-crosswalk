@@ -33,13 +33,6 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-unsigned WebCLDevice::getQueueProperties()
-{
-    cl_command_queue_properties queueProperties = 0;
-    clGetDeviceInfo(m_clDeviceId, CL_DEVICE_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &queueProperties, nullptr);
-    return static_cast<unsigned>(queueProperties);
-}
-
 unsigned long long WebCLDevice::getMaxMemAllocSize()
 {
     cl_ulong ulongUnits = 0;
@@ -361,8 +354,8 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(deviceFPConfig)));
         break;
     case CL_DEVICE_QUEUE_PROPERTIES: {
-        unsigned result = getQueueProperties();
-        if (result)
+        unsigned result = getInfo<cl_command_queue_properties>(CL_DEVICE_QUEUE_PROPERTIES, es);
+        if (!es.hadException())
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
         break;
     }
