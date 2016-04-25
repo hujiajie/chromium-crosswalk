@@ -38,7 +38,6 @@ public:
     bool enableExtension(const String& name);
     void getEnabledExtensions(HashSet<String>& extensions);
     Vector<String> getSupportedExtensions();
-    PassRefPtr<WebCLPlatform> getPlatform() const { return m_platform; }
     cl_device_id getDeviceId() { return m_clDeviceId; }
 
     template<typename T>

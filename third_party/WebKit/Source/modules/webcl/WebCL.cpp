@@ -205,7 +205,8 @@ PassRefPtr<WebCLContext> WebCL::createContext(const Vector<RefPtr<WebCLDevice>>&
 
     // Check all the enabled extensions and cache it to avoid enabling after context creation.
     HashSet<String> enabledExtensions;
-    getAllEnabledExtensions(this, devices[0]->getPlatform(), devices, enabledExtensions);
+    RefPtr<WebCLPlatform> platform = devices[0]->getInfo<RefPtr<WebCLPlatform>>(CL_DEVICE_PLATFORM, es);
+    getAllEnabledExtensions(this, platform, devices, enabledExtensions);
     RefPtr<WebCLContext> context = WebCLContext::create(clContextId, this, devices, enabledExtensions);
     if (!context) {
         es.throwWebCLException(WebCLException::FAILURE, WebCLException::failureMessage);
