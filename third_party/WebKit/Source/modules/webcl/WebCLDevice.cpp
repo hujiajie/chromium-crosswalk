@@ -33,7 +33,7 @@ PassRefPtr<WebCLDevice> WebCLDevice::create(cl_device_id deviceId, WebCLPlatform
     return adoptRef(new WebCLDevice(deviceId, platform));
 }
 
-ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, ExceptionState& es)
+ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, ExceptionState& es)
 {
     v8::Handle<v8::Object> creationContext = scriptState->context()->Global();
     v8::Isolate* isolate = scriptState->isolate();
@@ -43,329 +43,147 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned deviceType, 
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    if (!WebCLInputChecker::isValidDeviceInfoType(deviceType)) {
+    if (!WebCLInputChecker::isValidDeviceInfoType(name)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    char deviceString[1024];
-    cl_uint uintUnits = 0;
-    size_t sizetUnits = 0;
-    cl_ulong ulongUnits = 0;
-    cl_uint infoValue = 0;
-    cl_bool boolUnits = false;
-    cl_device_type type = 0;
-    cl_device_fp_config deviceFPConfig = 0;
-    cl_device_mem_cache_type globalType = 0;
-    cl_device_exec_capabilities exec = 0;
-    cl_device_local_mem_type localType = 0;
-
-    switch(deviceType) {
-    case CL_DEVICE_PROFILE:
-        return ScriptValue(scriptState, v8String(isolate, String("WEBCL_PROFILE")));
-    case CL_DEVICE_VERSION:
-        return ScriptValue(scriptState, v8String(isolate, String("WebCL 1.0")));
-    case CL_DEVICE_OPENCL_C_VERSION:
-        return ScriptValue(scriptState, v8String(isolate, String("WebCL C 1.0")));
-    case CL_DEVICE_EXTENSIONS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_EXTENSIONS, sizeof(deviceString), &deviceString, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8String(isolate, String(deviceString)));
-        break;
-    case CL_DEVICE_NAME:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NAME, sizeof(deviceString), &deviceString, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8String(isolate, String(deviceString)));
-        break;
-    case CL_DEVICE_VENDOR:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_VENDOR, sizeof(deviceString), &deviceString, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8String(isolate, String(deviceString)));
-        break;
-    case CL_DRIVER_VERSION:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DRIVER_VERSION, sizeof(deviceString), &deviceString, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8String(isolate, String(deviceString)));
-        break;
-    case CL_DEVICE_ADDRESS_BITS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_ADDRESS_BITS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_INT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_CLOCK_FREQUENCY:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_CONSTANT_ARGS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_CONSTANT_ARGS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_READ_IMAGE_ARGS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_READ_IMAGE_ARGS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_SAMPLERS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_SAMPLERS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_WRITE_IMAGE_ARGS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_WRITE_IMAGE_ARGS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MEM_BASE_ADDR_ALIGN:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_VENDOR_ID:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_VENDOR_ID, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_MAX_COMPUTE_UNITS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_DEVICE_IMAGE2D_MAX_HEIGHT: {
-        unsigned result = getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
-        break;
-    }
-    case CL_DEVICE_IMAGE2D_MAX_WIDTH: {
-        unsigned result = getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
-        break;
-    }
-    case CL_DEVICE_IMAGE3D_MAX_DEPTH:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_IMAGE3D_MAX_HEIGHT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_IMAGE3D_MAX_WIDTH:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_MAX_PARAMETER_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_PARAMETER_SIZE, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_MAX_WORK_GROUP_SIZE: {
-        unsigned result  = getInfo<size_t>(CL_DEVICE_MAX_WORK_GROUP_SIZE, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
-        break;
-    }
-    case CL_DEVICE_MAX_WORK_ITEM_SIZES: {
-        Vector<size_t> result = getInfo<Vector<size_t>>(CL_DEVICE_MAX_WORK_ITEM_SIZES, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, toV8(result, creationContext, isolate));
-        break;
-    }
-    case CL_DEVICE_PROFILING_TIMER_RESOLUTION:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PROFILING_TIMER_RESOLUTION, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_DEVICE_LOCAL_MEM_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
-    case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
-    case CL_DEVICE_MAX_MEM_ALLOC_SIZE: {
-        unsigned long long result = getInfo<cl_ulong>(CL_DEVICE_MAX_MEM_ALLOC_SIZE, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
-        break;
-    }
-    case CL_DEVICE_GLOBAL_MEM_CACHE_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
-    case CL_DEVICE_GLOBAL_MEM_SIZE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
+    switch (name) {
     case CL_DEVICE_AVAILABLE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_AVAILABLE, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
     case CL_DEVICE_COMPILER_AVAILABLE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_COMPILER_AVAILABLE, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
-    case CL_DEVICE_HOST_UNIFIED_MEMORY:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
-    case CL_DEVICE_ENDIAN_LITTLE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_ENDIAN_LITTLE, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
-    case CL_DEVICE_ERROR_CORRECTION_SUPPORT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_ERROR_CORRECTION_SUPPORT, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
     case CL_DEVICE_IMAGE_SUPPORT:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &boolUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(boolUnits)));
-        break;
+    case CL_DEVICE_ERROR_CORRECTION_SUPPORT:
+    case CL_DEVICE_HOST_UNIFIED_MEMORY:
+    case CL_DEVICE_ENDIAN_LITTLE:
+        {
+            cl_bool info = getInfo<cl_bool>(name, es);
+            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(info)));
+        }
+    case CL_DEVICE_VENDOR_ID:
+    case CL_DEVICE_MAX_COMPUTE_UNITS:
+    case CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS:
+    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:
+    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:
+    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:
+    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:
+    case CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR:
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT:
+    case CL_DEVICE_MAX_CLOCK_FREQUENCY:
+    case CL_DEVICE_ADDRESS_BITS:
+    case CL_DEVICE_MAX_READ_IMAGE_ARGS:
+    case CL_DEVICE_MAX_WRITE_IMAGE_ARGS:
+    case CL_DEVICE_MAX_SAMPLERS:
+    case CL_DEVICE_MEM_BASE_ADDR_ALIGN:
+    case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:
+    case CL_DEVICE_MAX_CONSTANT_ARGS:
+        {
+            cl_uint info = getInfo<cl_uint>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_DEVICE_MAX_MEM_ALLOC_SIZE:
+    case CL_DEVICE_GLOBAL_MEM_CACHE_SIZE:
+    case CL_DEVICE_GLOBAL_MEM_SIZE:
+    case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:
+    case CL_DEVICE_LOCAL_MEM_SIZE:
+        {
+            cl_ulong info = getInfo<cl_ulong>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_DEVICE_MAX_WORK_GROUP_SIZE:
+    case CL_DEVICE_IMAGE2D_MAX_WIDTH:
+    case CL_DEVICE_IMAGE2D_MAX_HEIGHT:
+    case CL_DEVICE_IMAGE3D_MAX_WIDTH:
+    case CL_DEVICE_IMAGE3D_MAX_HEIGHT:
+    case CL_DEVICE_IMAGE3D_MAX_DEPTH:
+    case CL_DEVICE_MAX_PARAMETER_SIZE:
+    case CL_DEVICE_PROFILING_TIMER_RESOLUTION:
+        {
+            size_t info = getInfo<size_t>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_DEVICE_TYPE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_TYPE, sizeof(type), &type, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(type)));
-        break;
+        {
+            cl_device_type info = getInfo<cl_device_type>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_DEVICE_SINGLE_FP_CONFIG:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_SINGLE_FP_CONFIG, sizeof(deviceFPConfig), &deviceFPConfig, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(deviceFPConfig)));
-        break;
-    case CL_DEVICE_QUEUE_PROPERTIES: {
-        unsigned result = getInfo<cl_command_queue_properties>(CL_DEVICE_QUEUE_PROPERTIES, es);
-        if (!es.hadException())
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, result));
-        break;
-    }
-    case CL_DEVICE_PLATFORM:
-        return ScriptValue(scriptState, toV8(m_platform, creationContext, isolate));
-    case CL_DEVICE_EXECUTION_CAPABILITIES:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_EXECUTION_CAPABILITIES, sizeof(cl_device_exec_capabilities), &exec, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(exec)));
-        break;
+        {
+            cl_device_fp_config info = getInfo<cl_device_fp_config>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_DEVICE_GLOBAL_MEM_CACHE_TYPE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE, sizeof(cl_device_mem_cache_type), &globalType, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(globalType)));
-        break;
+        {
+            cl_device_mem_cache_type info = getInfo<cl_device_mem_cache_type>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_DEVICE_LOCAL_MEM_TYPE:
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_LOCAL_MEM_TYPE, sizeof(cl_device_local_mem_type), &localType, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(localType)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:
-        if (!m_extension.isEnabledExtension("KHR_fp64"))
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, 0));
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE, sizeof(cl_uint), &infoValue, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(infoValue)));
-        break;
+        {
+            cl_device_local_mem_type info = getInfo<cl_device_local_mem_type>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_DEVICE_EXECUTION_CAPABILITIES:
+        {
+            cl_device_exec_capabilities info = getInfo<cl_device_exec_capabilities>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_DEVICE_QUEUE_PROPERTIES:
+        {
+            cl_command_queue_properties info = getInfo<cl_command_queue_properties>(name, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_DEVICE_PROFILE:
+    case CL_DEVICE_VERSION:
+    case CL_DEVICE_OPENCL_C_VERSION:
+    case CL_DEVICE_NAME:
+    case CL_DEVICE_VENDOR:
+    case CL_DRIVER_VERSION:
+    case CL_DEVICE_EXTENSIONS:
+        {
+            String info = getInfo<String>(name, es);
+            return ScriptValue(scriptState, v8String(isolate, info));
+        }
+    case CL_DEVICE_MAX_WORK_ITEM_SIZES:
+        {
+            Vector<size_t> info = getInfo<Vector<size_t>>(name, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
+    case CL_DEVICE_PLATFORM:
+        {
+            RefPtr<WebCLPlatform> info = getInfo<RefPtr<WebCLPlatform>>(name, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
     case CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:
-        if (!m_extension.isEnabledExtension("KHR_fp64"))
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, 0));
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE, sizeof(cl_uint), &infoValue, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(infoValue)));
-        break;
-    case CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:
-        if (!m_extension.isEnabledExtension("KHR_fp16"))
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, 0));
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF, sizeof(cl_uint), &infoValue, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(infoValue)));
-        break;
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:
+        {
+            cl_uint info = 0;
+            if (m_extension.isEnabledExtension("KHR_fp64")) {
+                cl_int status = clGetDeviceInfo(m_clDeviceId, name, sizeof(cl_uint), &info, nullptr);
+                if (status != CL_SUCCESS) {
+                    WebCLException::throwException(status, es);
+                }
+            }
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF:
-        if (!m_extension.isEnabledExtension("KHR_fp16"))
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, 0));
-        err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF, sizeof(cl_uint), &infoValue, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(infoValue)));
-        break;
+    case CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:
+        {
+            cl_uint info = 0;
+            if (m_extension.isEnabledExtension("KHR_fp16")) {
+                cl_int status = clGetDeviceInfo(m_clDeviceId, name, sizeof(cl_uint), &info, nullptr);
+                if (status != CL_SUCCESS) {
+                    WebCLException::throwException(status, es);
+                }
+            }
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     default:
         es.throwWebCLException(WebCLException::FAILURE, WebCLException::failureMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 void WebCLDevice::cacheDeviceExtensions()
