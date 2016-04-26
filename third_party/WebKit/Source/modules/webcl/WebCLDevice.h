@@ -9,6 +9,7 @@
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
+#include "modules/webcl/WebCLObjectInfoTraits.h"
 #include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLPlatform.h"
 
@@ -41,7 +42,7 @@ public:
     cl_device_id getDeviceId() { return m_clDeviceId; }
 
     template<typename T>
-    T getInfo(unsigned name, ExceptionState& exceptionState)
+    typename WebCLObjectInfoTraits<T>::ReturnType getInfo(unsigned name, ExceptionState& exceptionState)
     {
         int status;
         T info;
