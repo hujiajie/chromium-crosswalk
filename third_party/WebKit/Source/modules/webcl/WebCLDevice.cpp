@@ -433,28 +433,19 @@ int WebCLDevice::getAsSpecialInfo(RefPtr<WebCLPlatform>& info, unsigned name)
 int WebCLDevice::getAsOrdinaryInfo(String& info, unsigned name)
 {
     int status;
-    size_t expectedSizeInBytes = sizeof(char);
-    size_t actualSizeInBytes;
-    size_t maxSizeInBytes = UINT_MAX;
+    size_t sizeInBytes = 0;
 
-    do {
-        status = clGetDeviceInfo(m_clDeviceId, name, expectedSizeInBytes, nullptr, &actualSizeInBytes);
-        if (status != WebCLException::SUCCESS)
-            return status;
-        if (actualSizeInBytes < expectedSizeInBytes || expectedSizeInBytes == maxSizeInBytes)
-            break;
-        if (expectedSizeInBytes <= maxSizeInBytes / 2)
-            expectedSizeInBytes *= 2;
-        else
-            expectedSizeInBytes = maxSizeInBytes;
-    } while (true);
+    status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringInfo = new char[sizeInBytes / sizeof(char)];
+        status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringInfo, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringInfo;
+        delete [] stringInfo;
+        return status;
+    }
 
-    char* stringInfo = new char[actualSizeInBytes / sizeof(char)];
-    status = clGetDeviceInfo(m_clDeviceId, name, actualSizeInBytes, stringInfo, nullptr);
-    if (status == WebCLException::SUCCESS)
-        info = stringInfo;
-    delete [] stringInfo;
-    return status;
+    return WebCLException::FAILURE;
 }
 
 WebCLDevice::WebCLDevice(cl_device_id device, WebCLPlatform* platform)

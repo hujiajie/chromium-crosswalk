@@ -81,24 +81,15 @@ private:
     int getAsOrdinaryInfo(Vector<T>& info, unsigned name)
     {
         int status;
-        size_t expectedSizeInBytes = sizeof(T);
-        size_t actualSizeInBytes;
-        size_t maxSizeInBytes = std::numeric_limits<size_t>::max();
+        size_t sizeInBytes = 0;
 
-        do {
-            status = clGetDeviceInfo(m_clDeviceId, name, expectedSizeInBytes, nullptr, &actualSizeInBytes);
-            if (status != WebCLException::SUCCESS)
-                return status;
-            if (actualSizeInBytes < expectedSizeInBytes || expectedSizeInBytes == maxSizeInBytes)
-                break;
-            if (expectedSizeInBytes <= maxSizeInBytes / 2)
-                expectedSizeInBytes *= 2;
-            else
-                expectedSizeInBytes = maxSizeInBytes;
-        } while (true);
+        status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
+        if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
+            info.resize(sizeInBytes / sizeof(T));
+            return clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, info.data(), nullptr);
+        }
 
-        info.resize(actualSizeInBytes / sizeof(T));
-        return clGetDeviceInfo(m_clDeviceId, name, actualSizeInBytes, info.data(), nullptr);
+        return WebCLException::FAILURE;
     }
     int getAsOrdinaryInfo(String& info, unsigned name);
 
