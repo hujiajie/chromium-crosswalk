@@ -405,6 +405,14 @@ void WebCLDevice::getEnabledExtensions(HashSet<String>& extensions)
     m_extension.getEnabledExtensions(extensions);
 }
 
+int WebCLDevice::getAsSpecialInfo(cl_device_exec_capabilities& info, unsigned name)
+{
+    if (name != CL_DEVICE_EXECUTION_CAPABILITIES)
+        return WebCLException::INVALID_VALUE;
+    info = CL_EXEC_KERNEL;
+    return WebCLException::SUCCESS;
+}
+
 int WebCLDevice::getAsSpecialInfo(String& info, unsigned name)
 {
     switch (name) {

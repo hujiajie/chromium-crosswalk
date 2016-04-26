@@ -69,6 +69,7 @@ private:
     {
         return WebCLException::INVALID_VALUE;
     }
+    int getAsSpecialInfo(cl_device_exec_capabilities& info, unsigned name);
     int getAsSpecialInfo(String& info, unsigned name);
     int getAsSpecialInfo(RefPtr<WebCLPlatform>& info, unsigned name);
 
