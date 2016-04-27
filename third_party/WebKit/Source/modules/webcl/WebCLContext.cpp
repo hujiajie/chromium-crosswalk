@@ -81,11 +81,9 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* devi
     // NOTE: if device is null, it will be selected by any WebCLDevice that matches Properties
     if (!device) {
         for (auto deviceItem : m_devices) {
-            unsigned properties = deviceItem->getInfo<cl_command_queue_properties>(CL_DEVICE_QUEUE_PROPERTIES, es);
-            if (es.hadException()) {
-                es.clearException();
+            cl_command_queue_properties properties;
+            if (deviceItem->getInfo(CL_DEVICE_QUEUE_PROPERTIES, properties) != WebCLException::SUCCESS)
                 properties = 0;
-            }
             if (!commandQueueProp || (properties && (properties & commandQueueProp))) {
                 device = deviceItem.get();
                 clDevice = deviceItem->getDeviceId();
@@ -277,11 +275,9 @@ PassRefPtr<WebCLBuffer> WebCLContext::createBufferBase(unsigned memFlags, unsign
 
     unsigned num = 0 ;
     for (size_t i = 0; i < m_devices.size(); ++i) {
-        unsigned maxMemAllocSize = m_devices[i]->getInfo<cl_ulong>(CL_DEVICE_MAX_MEM_ALLOC_SIZE, es);
-        if (es.hadException()) {
-            es.clearException();
+        cl_ulong maxMemAllocSize;
+        if (m_devices[i]->getInfo(CL_DEVICE_MAX_MEM_ALLOC_SIZE, maxMemAllocSize) != WebCLException::SUCCESS)
             maxMemAllocSize = 0;
-        }
         if (maxMemAllocSize && maxMemAllocSize < sizeInBytes) {
             num++;
         }
@@ -706,18 +702,12 @@ WebCLContext::WebCLContext(cl_context context, WebCL* webCL, const Vector<RefPtr
 bool WebCLContext::supportsWidthHeight(unsigned width, unsigned height, ExceptionState& es)
 {
     if (m_devices.size() && !m_deviceMaxValues.size()) {
-        unsigned deviceMaxWidth = 0, deviceMaxHeight = 0;
+        size_t deviceMaxWidth = 0, deviceMaxHeight = 0;
         for (auto device : m_devices) {
-            deviceMaxWidth = device->getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH, es);
-            if (es.hadException()) {
-                es.clearException();
+            if (device->getInfo(CL_DEVICE_IMAGE2D_MAX_WIDTH, deviceMaxWidth) != WebCLException::SUCCESS)
                 deviceMaxWidth = 0;
-            }
-            deviceMaxHeight = device->getInfo<size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT, es);
-            if (es.hadException()) {
-                es.clearException();
+            if (device->getInfo(CL_DEVICE_IMAGE2D_MAX_HEIGHT, deviceMaxHeight) != WebCLException::SUCCESS)
                 deviceMaxHeight = 0;
-            }
             if (deviceMaxWidth && deviceMaxHeight)
                 m_deviceMaxValues.add(device.get(), std::make_pair(deviceMaxWidth, deviceMaxHeight));
         }

@@ -9,7 +9,6 @@
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
-#include "modules/webcl/WebCLObjectInfoTraits.h"
 #include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLPlatform.h"
 
@@ -42,48 +41,27 @@ public:
     cl_device_id getDeviceId() { return m_clDeviceId; }
 
     template<typename T>
-    typename WebCLObjectInfoTraits<T>::ReturnType getInfo(unsigned name, ExceptionState& exceptionState)
+    int getInfo(unsigned name, T& info)
     {
-        int status;
-        T info;
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+            return status;
 
-        status = getAsSpecialInfo(info, name);
-        if (status == WebCLException::SUCCESS)
-            return info;
-        if (status != WebCLException::INVALID_VALUE) {
-            WebCLException::throwException(status, exceptionState);
-            return info;
-        }
-
-        status = getAsOrdinaryInfo(info, name);
-        if (status != WebCLException::SUCCESS)
-            WebCLException::throwException(status, exceptionState);
-        return info;
-    }
-
-private:
-    WebCLDevice(cl_device_id, WebCLPlatform* platform);
-
-    template<typename T>
-    int getAsSpecialInfo(T& info, unsigned name)
-    {
-        return WebCLException::INVALID_VALUE;
-    }
-    int getAsSpecialInfo(cl_device_exec_capabilities& info, unsigned name);
-    int getAsSpecialInfo(String& info, unsigned name);
-    int getAsSpecialInfo(RefPtr<WebCLPlatform>& info, unsigned name);
-
-    template<typename T>
-    int getAsOrdinaryInfo(T& info, unsigned name)
-    {
         return clGetDeviceInfo(m_clDeviceId, name, sizeof(T), &info, nullptr);
     }
     template<typename T>
-    int getAsOrdinaryInfo(Vector<T>& info, unsigned name)
+    int getInfo(unsigned name, RefPtr<T>& info)
     {
-        int status;
-        size_t sizeInBytes = 0;
+        return getInfoCustom(name, info);
+    }
+    template<typename T>
+    int getInfo(unsigned name, Vector<T>& info)
+    {
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+            return status;
 
+        size_t sizeInBytes = 0;
         status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
         if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
             info.resize(sizeInBytes / sizeof(T));
@@ -92,7 +70,19 @@ private:
 
         return WebCLException::FAILURE;
     }
-    int getAsOrdinaryInfo(String& info, unsigned name);
+    int getInfo(unsigned name, String&);
+
+private:
+    WebCLDevice(cl_device_id, WebCLPlatform* platform);
+
+    template<typename T>
+    int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+    int getInfoCustom(unsigned name, cl_device_exec_capabilities&);
+    int getInfoCustom(unsigned name, String&);
+    int getInfoCustom(unsigned name, RefPtr<WebCLPlatform>&);
 
     WebCLPlatform* m_platform;
     WebCLExtension m_extension;

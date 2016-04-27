@@ -48,6 +48,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
+    int status;
     switch (name) {
     case CL_DEVICE_AVAILABLE:
     case CL_DEVICE_COMPILER_AVAILABLE:
@@ -56,7 +57,10 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     case CL_DEVICE_HOST_UNIFIED_MEMORY:
     case CL_DEVICE_ENDIAN_LITTLE:
         {
-            cl_bool info = getInfo<cl_bool>(name, es);
+            cl_bool info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(info)));
         }
     case CL_DEVICE_VENDOR_ID:
@@ -81,7 +85,10 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:
     case CL_DEVICE_MAX_CONSTANT_ARGS:
         {
-            cl_uint info = getInfo<cl_uint>(name, es);
+            cl_uint info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_MAX_MEM_ALLOC_SIZE:
@@ -90,7 +97,10 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:
     case CL_DEVICE_LOCAL_MEM_SIZE:
         {
-            cl_ulong info = getInfo<cl_ulong>(name, es);
+            cl_ulong info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_MAX_WORK_GROUP_SIZE:
@@ -102,37 +112,58 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     case CL_DEVICE_MAX_PARAMETER_SIZE:
     case CL_DEVICE_PROFILING_TIMER_RESOLUTION:
         {
-            size_t info = getInfo<size_t>(name, es);
+            size_t info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_TYPE:
         {
-            cl_device_type info = getInfo<cl_device_type>(name, es);
+            cl_device_type info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_SINGLE_FP_CONFIG:
         {
-            cl_device_fp_config info = getInfo<cl_device_fp_config>(name, es);
+            cl_device_fp_config info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_GLOBAL_MEM_CACHE_TYPE:
         {
-            cl_device_mem_cache_type info = getInfo<cl_device_mem_cache_type>(name, es);
+            cl_device_mem_cache_type info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_LOCAL_MEM_TYPE:
         {
-            cl_device_local_mem_type info = getInfo<cl_device_local_mem_type>(name, es);
+            cl_device_local_mem_type info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_EXECUTION_CAPABILITIES:
         {
-            cl_device_exec_capabilities info = getInfo<cl_device_exec_capabilities>(name, es);
+            cl_device_exec_capabilities info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_QUEUE_PROPERTIES:
         {
-            cl_command_queue_properties info = getInfo<cl_command_queue_properties>(name, es);
+            cl_command_queue_properties info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_DEVICE_PROFILE:
@@ -143,17 +174,26 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     case CL_DRIVER_VERSION:
     case CL_DEVICE_EXTENSIONS:
         {
-            String info = getInfo<String>(name, es);
+            String info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8String(isolate, info));
         }
     case CL_DEVICE_MAX_WORK_ITEM_SIZES:
         {
-            Vector<size_t> info = getInfo<Vector<size_t>>(name, es);
+            Vector<size_t> info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, toV8(info, creationContext, isolate));
         }
     case CL_DEVICE_PLATFORM:
         {
-            RefPtr<WebCLPlatform> info = getInfo<RefPtr<WebCLPlatform>>(name, es);
+            RefPtr<WebCLPlatform> info;
+            status = getInfo(name, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
             return ScriptValue(scriptState, toV8(info, creationContext, isolate));
         }
     case CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:
@@ -223,7 +263,27 @@ void WebCLDevice::getEnabledExtensions(HashSet<String>& extensions)
     m_extension.getEnabledExtensions(extensions);
 }
 
-int WebCLDevice::getAsSpecialInfo(cl_device_exec_capabilities& info, unsigned name)
+int WebCLDevice::getInfo(unsigned name, String& info)
+{
+    int status = getInfoCustom(name, info);
+    if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+        return status;
+
+    size_t sizeInBytes = 0;
+    status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringInfo = new char[sizeInBytes / sizeof(char)];
+        status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringInfo, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringInfo;
+        delete [] stringInfo;
+        return status;
+    }
+
+    return WebCLException::FAILURE;
+}
+
+int WebCLDevice::getInfoCustom(unsigned name, cl_device_exec_capabilities& info)
 {
     if (name != CL_DEVICE_EXECUTION_CAPABILITIES)
         return WebCLException::INVALID_VALUE;
@@ -231,7 +291,7 @@ int WebCLDevice::getAsSpecialInfo(cl_device_exec_capabilities& info, unsigned na
     return WebCLException::SUCCESS;
 }
 
-int WebCLDevice::getAsSpecialInfo(String& info, unsigned name)
+int WebCLDevice::getInfoCustom(unsigned name, String& info)
 {
     switch (name) {
     case CL_DEVICE_PROFILE:
@@ -248,30 +308,12 @@ int WebCLDevice::getAsSpecialInfo(String& info, unsigned name)
     }
 }
 
-int WebCLDevice::getAsSpecialInfo(RefPtr<WebCLPlatform>& info, unsigned name)
+int WebCLDevice::getInfoCustom(unsigned name, RefPtr<WebCLPlatform>& info)
 {
     if (name != CL_DEVICE_PLATFORM)
         return WebCLException::INVALID_VALUE;
     info = m_platform;
     return WebCLException::SUCCESS;
-}
-
-int WebCLDevice::getAsOrdinaryInfo(String& info, unsigned name)
-{
-    int status;
-    size_t sizeInBytes = 0;
-
-    status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
-    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
-        char* stringInfo = new char[sizeInBytes / sizeof(char)];
-        status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringInfo, nullptr);
-        if (status == WebCLException::SUCCESS)
-            info = stringInfo;
-        delete [] stringInfo;
-        return status;
-    }
-
-    return WebCLException::FAILURE;
 }
 
 WebCLDevice::WebCLDevice(cl_device_id device, WebCLPlatform* platform)
