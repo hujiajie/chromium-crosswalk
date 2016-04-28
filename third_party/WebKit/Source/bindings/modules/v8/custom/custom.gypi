@@ -10,6 +10,7 @@
             'V8DeviceMotionEventCustom.cpp',
             'V8ExtendableMessageEventCustom.cpp',
             'V8ServiceWorkerMessageEventCustom.cpp',
+            'V8WebCLCommandQueueCustom.cpp',
         ],
     },
 }
