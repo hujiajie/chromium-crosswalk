@@ -228,19 +228,17 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
 
 void WebCLDevice::cacheDeviceExtensions()
 {
-    char deviceString[MULTI_EXTENSIONS_LENGTH] = "";
+    String deviceString;
     Vector<String> extensions;
 
     if (!m_clDeviceId)
         return;
 
-    cl_int err = clGetDeviceInfo(m_clDeviceId, CL_DEVICE_EXTENSIONS, sizeof(deviceString), &deviceString, nullptr);
-
-    if (err != CL_SUCCESS)
+    int status = getInfo(CL_DEVICE_EXTENSIONS, deviceString);
+    if (status != CL_SUCCESS)
         return;
 
-    String temp = String(deviceString);
-    temp.split(' ', extensions);
+    deviceString.split(' ', extensions);
 
     for (auto extension : extensions) {
         if (!extension.containsOnlyWhitespace())
