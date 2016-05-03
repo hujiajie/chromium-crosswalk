@@ -52,18 +52,24 @@ ScriptValue WebCLContext::getInfo(ScriptState* scriptState, int paramName, Excep
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    cl_uint uintUnits = 0;
-    Vector<RefPtr<WebCLDevice>> result;
+    int status;
     switch(paramName) {
     case CL_CONTEXT_NUM_DEVICES:
-        err = clGetContextInfo(m_clContext,CL_CONTEXT_NUM_DEVICES, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        WebCLException::throwException(err, es);
-        return ScriptValue(scriptState, v8::Null(isolate));
+        {
+            cl_uint info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_CONTEXT_DEVICES:
-        return ScriptValue(scriptState, toV8(m_devices, creationContext, isolate));
+        {
+            Vector<RefPtr<WebCLDevice>> info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
