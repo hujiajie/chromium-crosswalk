@@ -119,15 +119,20 @@ ScriptValue WebCLPlatform::getInfo(ScriptState* scriptState, int platformInfo, E
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
+    int status;
     switch (platformInfo) {
     case CL_PLATFORM_PROFILE:
-        return ScriptValue(scriptState, v8String(isolate, String("WEBCL_PROFILE")));
     case CL_PLATFORM_VERSION:
-        return ScriptValue(scriptState, v8String(isolate, String("WebCL 1.0")));
     case CL_PLATFORM_NAME:
     case CL_PLATFORM_VENDOR:
     case CL_PLATFORM_EXTENSIONS:
-        return ScriptValue(scriptState, v8String(isolate, emptyString()));
+        {
+            String info;
+            status = getInfo(platformInfo, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8String(isolate, info));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
