@@ -56,27 +56,36 @@ ScriptValue WebCLCommandQueue::getInfo(ScriptState* scriptState, int paramName, 
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    cl_command_queue_properties queueProperties = 0;
+    int status;
     switch(paramName) {
     case CL_QUEUE_CONTEXT:
-        return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
-        break;
+        {
+            RefPtr<WebCLContext> info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
     case CL_QUEUE_DEVICE:
-        return ScriptValue(scriptState, toV8(m_device, creationContext, isolate));
-        break;
+        {
+            RefPtr<WebCLDevice> info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
     case CL_QUEUE_PROPERTIES:
-        err = clGetCommandQueueInfo(m_clCommandQueue, CL_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &queueProperties, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(queueProperties)));
-        break;
+        {
+            cl_command_queue_properties info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 unsigned WebCLCommandQueue::getProperties()
