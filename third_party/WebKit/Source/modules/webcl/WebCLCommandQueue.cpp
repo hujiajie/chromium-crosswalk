@@ -41,7 +41,7 @@ WebCLCommandQueue::~WebCLCommandQueue()
     ASSERT(!m_clCommandQueue);
 }
 
-PassRefPtr<WebCLCommandQueue> WebCLCommandQueue::create(cl_command_queue commandQueue, PassRefPtr<WebCLContext> context, WebCLDevice* device)
+PassRefPtr<WebCLCommandQueue> WebCLCommandQueue::create(cl_command_queue commandQueue, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLDevice> device)
 {
     return adoptRef(new WebCLCommandQueue(commandQueue, context, device));
 }
@@ -1206,7 +1206,7 @@ void WebCLCommandQueue::enqueueCopyBufferToImage(WebCLBuffer* srcBuffer, WebCLIm
         WebCLException::throwException(err, es);
 }
 
-WebCLCommandQueue::WebCLCommandQueue(cl_command_queue commandQueue, PassRefPtr<WebCLContext> context, WebCLDevice* device)
+WebCLCommandQueue::WebCLCommandQueue(cl_command_queue commandQueue, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLDevice> device)
     : WebCLObject(context)
     , m_whenFinishCallback(nullptr)
     , m_eventForCallback(0)

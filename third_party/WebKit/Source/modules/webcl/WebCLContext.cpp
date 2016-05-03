@@ -76,13 +76,14 @@ ScriptValue WebCLContext::getInfo(ScriptState* scriptState, int paramName, Excep
     }
 }
 
-PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* device, unsigned commandQueueProp, ExceptionState& es)
+PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(PassRefPtr<WebCLDevice> device, unsigned commandQueueProp, ExceptionState& es)
 {
     if (!WebCLInputChecker::isValidCommandQueueProperty(commandQueueProp)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return nullptr;
     }
 
+    RefPtr<WebCLDevice> selectedDevice;
     cl_device_id clDevice = nullptr;
     // NOTE: if device is null, it will be selected by any WebCLDevice that matches Properties
     if (!device) {
@@ -91,7 +92,7 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* devi
             if (deviceItem->getInfo(CL_DEVICE_QUEUE_PROPERTIES, properties) != WebCLException::SUCCESS)
                 properties = 0;
             if (!commandQueueProp || (properties && (properties & commandQueueProp))) {
-                device = deviceItem.get();
+                selectedDevice = deviceItem;
                 clDevice = deviceItem->getDeviceId();
                 break;
             } else {
@@ -100,6 +101,7 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* devi
             }
         }
     } else {
+        selectedDevice = device;
         clDevice = device->getDeviceId();
         size_t i = 0;
         for (i = 0; i < m_devices.size(); ++i) {
@@ -131,7 +133,7 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* devi
         return nullptr;
     }
 
-    RefPtr<WebCLCommandQueue> commandQueue = WebCLCommandQueue::create(clCommandQueueId, this, device);
+    RefPtr<WebCLCommandQueue> commandQueue = WebCLCommandQueue::create(clCommandQueueId, this, selectedDevice);
     if (!commandQueue) {
         es.throwWebCLException(WebCLException::INVALID_COMMAND_QUEUE, WebCLException::invalidCommandQueueMessage);
         return nullptr;
@@ -148,7 +150,7 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(int properties,Ex
     return createCommandQueue(nullptr, properties, es);
 }
 
-PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(WebCLDevice* device, ExceptionState& es)
+PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(PassRefPtr<WebCLDevice> device, ExceptionState& es)
 {
     return createCommandQueue(device, 0, es);
 }

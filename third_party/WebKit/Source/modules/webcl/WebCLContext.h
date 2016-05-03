@@ -45,9 +45,9 @@ public:
     static PassRefPtr<WebCLContext> create(cl_context, WebCL*, const Vector<RefPtr<WebCLDevice>>&, HashSet<String>&);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
-    PassRefPtr<WebCLCommandQueue> createCommandQueue(WebCLDevice*, unsigned, ExceptionState&);
+    PassRefPtr<WebCLCommandQueue> createCommandQueue(PassRefPtr<WebCLDevice>, unsigned, ExceptionState&);
     PassRefPtr<WebCLCommandQueue> createCommandQueue(int, ExceptionState&);
-    PassRefPtr<WebCLCommandQueue> createCommandQueue(WebCLDevice*, ExceptionState&);
+    PassRefPtr<WebCLCommandQueue> createCommandQueue(PassRefPtr<WebCLDevice>, ExceptionState&);
     PassRefPtr<WebCLCommandQueue> createCommandQueue(ExceptionState& es);
     PassRefPtr<WebCLProgram> createProgram(const String&, ExceptionState&);
     PassRefPtr<WebCLSampler> createSampler(bool, unsigned, unsigned, ExceptionState&);
