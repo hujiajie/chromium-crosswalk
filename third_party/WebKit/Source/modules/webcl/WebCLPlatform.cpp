@@ -141,19 +141,17 @@ ScriptValue WebCLPlatform::getInfo(ScriptState* scriptState, int platformInfo, E
 
 void WebCLPlatform::cachePlatformExtensions()
 {
-    char platformString[MULTI_EXTENSIONS_LENGTH] = "";
+    String platformString;
     Vector<String> extensions;
 
     if (!m_clPlatformId)
         return;
 
-    cl_int err = clGetPlatformInfo(m_clPlatformId, CL_PLATFORM_EXTENSIONS, sizeof(platformString), &platformString, nullptr);
-
-    if (err != CL_SUCCESS)
+    int status = getInfo(CL_PLATFORM_EXTENSIONS, platformString);
+    if (status != CL_SUCCESS)
         return;
 
-    String temp = String(platformString);
-    temp.split(' ', extensions);
+    platformString.split(' ', extensions);
 
     for (auto extension : extensions) {
         if (!extension.containsOnlyWhitespace())
