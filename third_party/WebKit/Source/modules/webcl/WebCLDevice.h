@@ -44,7 +44,7 @@ public:
     int getInfo(unsigned name, T& info)
     {
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::INVALID_VALUE)
             return status;
 
         return clGetDeviceInfo(m_clDeviceId, name, sizeof(T), &info, nullptr);
@@ -58,7 +58,7 @@ public:
     int getInfo(unsigned name, Vector<T>& info)
     {
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::INVALID_VALUE)
             return status;
 
         size_t sizeInBytes = 0;

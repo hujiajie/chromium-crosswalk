@@ -264,7 +264,7 @@ void WebCLDevice::getEnabledExtensions(HashSet<String>& extensions)
 int WebCLDevice::getInfo(unsigned name, String& info)
 {
     int status = getInfoCustom(name, info);
-    if (status != WebCLException::SUCCESS && status != WebCLException::INVALID_VALUE)
+    if (status != WebCLException::INVALID_VALUE)
         return status;
 
     size_t sizeInBytes = 0;
