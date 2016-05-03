@@ -77,7 +77,8 @@ ScriptValue WebCLKernel::getWorkGroupInfo(ScriptState* scriptState, WebCLDevice*
     }
 
     cl_device_id clDevice = nullptr;
-    Vector<RefPtr<WebCLDevice>> deviceList = context()->getDevices();
+    Vector<RefPtr<WebCLDevice>> deviceList;
+    context()->getInfo(CL_CONTEXT_DEVICES, deviceList);
     if (device) {
         clDevice = device->getDeviceId();
         if (!clDevice) {

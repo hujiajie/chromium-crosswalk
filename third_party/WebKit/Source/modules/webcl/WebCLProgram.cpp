@@ -101,7 +101,8 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, int paramName, Excep
 
     cl_int err = CL_SUCCESS;
     cl_uint uintUnits = 0;
-    Vector<RefPtr<WebCLDevice>> result = context()->getDevices();
+    Vector<RefPtr<WebCLDevice>> result;
+    context()->getInfo(CL_CONTEXT_DEVICES, result);
 
     switch(paramName) {
     case CL_PROGRAM_NUM_DEVICES:
@@ -139,7 +140,8 @@ ScriptValue WebCLProgram::getBuildInfo(ScriptState* scriptState, WebCLDevice* de
             return ScriptValue(scriptState, v8::Null(isolate));
         }
         size_t i = 0;
-        Vector<RefPtr<WebCLDevice>> deviceList = context()->getDevices();
+        Vector<RefPtr<WebCLDevice>> deviceList;
+        context()->getInfo(CL_CONTEXT_DEVICES, deviceList);
         for (; i < deviceList.size(); i ++) {
             if (clDevice == deviceList[i]->getDeviceId())
                 break;
@@ -389,7 +391,8 @@ void WebCLProgram::build(const Vector<RefPtr<WebCLDevice>>& devices, const Strin
 
     cl_int err = CL_SUCCESS;
     Vector<cl_device_id> clDevices;
-    Vector<RefPtr<WebCLDevice>> contextDevices = context()->getDevices();
+    Vector<RefPtr<WebCLDevice>> contextDevices;
+    context()->getInfo(CL_CONTEXT_DEVICES, contextDevices);
     if (devices.size()) {
         Vector<cl_device_id> inputDevices;
         for (auto device : devices)

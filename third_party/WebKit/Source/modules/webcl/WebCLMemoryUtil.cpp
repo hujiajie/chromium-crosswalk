@@ -56,7 +56,9 @@ void WebCLMemoryUtil::ensureMemory(WebCLMemoryObject* memoryObject, WebCLCommand
         }
 
         m_program = WebCLProgram::create(clProgramId, m_context, String(programSource));
-        m_program->build(m_context->getDevices(), emptyString(), nullptr, es);
+        Vector<RefPtr<WebCLDevice>> devices;
+        m_context->getInfo(CL_CONTEXT_DEVICES, devices);
+        m_program->build(devices, emptyString(), nullptr, es);
 
         cl_kernel clKernelId16 = clCreateKernel(clProgramId, "init16", &err);
         if (err != CL_SUCCESS) {
