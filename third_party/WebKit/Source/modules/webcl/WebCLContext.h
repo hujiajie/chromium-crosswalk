@@ -7,11 +7,13 @@
 #define WebCLContext_h
 
 #include "bindings/core/v8/Nullable.h"
+#include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLDevice.h"
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 #include <wtf/PassRefPtr.h>
+#include <wtf/Vector.h>
 #include <wtf/WeakPtr.h>
 
 namespace blink {
@@ -76,6 +78,21 @@ public:
     WebCLHTMLUtil* getHTMLUtil() const { return m_HTMLUtil.get(); }
     cl_context getContext() const { return m_clContext; }
 
+    template<typename T>
+    int getInfo(unsigned name, T& info)
+    {
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetContextInfo(m_clContext, name, sizeof(T), &info, nullptr);
+    }
+    template<typename T>
+    int getInfo(unsigned name, Vector<RefPtr<T>>& info)
+    {
+        return getInfoCustom(name, info);
+    }
+
 private:
     WebCLContext(cl_context, WebCL*, const Vector<RefPtr<WebCLDevice>>&, HashSet<String>&);
     bool isReleased() const { return !m_clContext; }
@@ -84,6 +101,13 @@ private:
     PassRefPtr<WebCLImage> createImage2DBase(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, void*, ExceptionState&);
     PassRefPtr<WebCLBuffer> createBufferBase(unsigned memoryFlags, unsigned size, void* data, ExceptionState&);
     bool supportsWidthHeight(unsigned width, unsigned height, ExceptionState&);
+
+    template<typename T>
+    int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+    int getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>&);
 
     Vector<RefPtr<WebCLDevice>> m_devices;
     HashSet<String> m_enabledExtensions;

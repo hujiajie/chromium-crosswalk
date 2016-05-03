@@ -726,4 +726,12 @@ bool WebCLContext::isExtensionEnabled(const String& name) const
     return m_enabledExtensions.contains(name);
 }
 
+int WebCLContext::getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>& info)
+{
+    if (name != CL_CONTEXT_DEVICES)
+        return WebCLException::INVALID_VALUE;
+    info = m_devices;
+    return WebCLException::SUCCESS;
+}
+
 } // namespace blink
