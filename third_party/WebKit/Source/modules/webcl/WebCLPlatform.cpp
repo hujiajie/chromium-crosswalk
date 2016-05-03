@@ -171,6 +171,40 @@ void WebCLPlatform::getEnabledExtensions(HashSet<String>& extensions)
     m_extension.getEnabledExtensions(extensions);
 }
 
+int WebCLPlatform::getInfo(unsigned name, String& info)
+{
+    int status = getInfoCustom(name, info);
+    if (status != WebCLException::INVALID_VALUE)
+        return status;
+
+    size_t sizeInBytes = 0;
+    status = clGetPlatformInfo(m_clPlatformId, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringInfo = new char[sizeInBytes / sizeof(char)];
+        status = clGetPlatformInfo(m_clPlatformId, name, sizeInBytes, stringInfo, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringInfo;
+        delete [] stringInfo;
+        return status;
+    }
+
+    return WebCLException::FAILURE;
+}
+
+int WebCLPlatform::getInfoCustom(unsigned name, String& info)
+{
+    switch (name) {
+    case CL_PLATFORM_PROFILE:
+        info = "WEBCL_PROFILE";
+        return WebCLException::SUCCESS;
+    case CL_PLATFORM_VERSION:
+        info = "WebCL 1.0";
+        return WebCLException::SUCCESS;
+    default:
+        return WebCLException::INVALID_VALUE;
+    }
+}
+
 WebCLPlatform::WebCLPlatform(cl_platform_id platform)
     : m_cachedDeviceType(0)
     , m_clPlatformId(platform)

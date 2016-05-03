@@ -12,6 +12,7 @@
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/text/WTFString.h>
 
 namespace blink {
 
@@ -35,8 +36,12 @@ public:
     void getEnabledExtensions(HashSet<String>& extensions);
     cl_platform_id getPlatformId() { return m_clPlatformId; }
 
+    int getInfo(unsigned name, String&);
+
 private:
     WebCLPlatform(cl_platform_id);
+
+    int getInfoCustom(unsigned name, String&);
 
     Vector<RefPtr<WebCLDevice>> m_devices;
     unsigned m_cachedDeviceType;
