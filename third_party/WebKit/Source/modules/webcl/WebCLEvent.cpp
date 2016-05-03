@@ -94,7 +94,12 @@ ScriptValue WebCLEvent::getProfilingInfo(ScriptState* scriptState, unsigned para
     }
 
     int status = getStatus();
-    unsigned properties = m_commandQueue ? m_commandQueue->getProperties() : 0;
+    cl_command_queue_properties properties = 0;
+    if (m_commandQueue) {
+        if (m_commandQueue->getInfo(CL_QUEUE_PROPERTIES, properties) != WebCLException::SUCCESS) {
+            properties = 0;
+        }
+    }
     if (isUserEvent() || status != CL_COMPLETE || !(properties & CL_QUEUE_PROFILING_ENABLE)) {
         es.throwWebCLException(WebCLException::PROFILING_INFO_NOT_AVAILABLE, WebCLException::profilingInfoNotAvailableMessage);
         return ScriptValue(scriptState, v8::Null(isolate));

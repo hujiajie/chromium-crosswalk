@@ -88,16 +88,6 @@ ScriptValue WebCLCommandQueue::getInfo(ScriptState* scriptState, int paramName, 
     }
 }
 
-unsigned WebCLCommandQueue::getProperties()
-{
-    cl_command_queue_properties queueProperties;
-    cl_int err = clGetCommandQueueInfo(m_clCommandQueue, CL_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &queueProperties, nullptr);
-    if (err == CL_SUCCESS)
-        return static_cast<unsigned>(queueProperties);
-
-    return 0;
-}
-
 void WebCLCommandQueue::finish(WebCLCallback* whenFinished, ExceptionState& es)
 {
     if (isReleased() || m_whenFinishCallback) {

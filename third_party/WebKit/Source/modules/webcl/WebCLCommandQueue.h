@@ -88,7 +88,6 @@ public:
         SYNC
     };
     void finishCommandQueues(SyncMethod);
-    unsigned getProperties();
     bool isReleased() const { return !m_clCommandQueue; }
 
     template<typename T>
