@@ -6,12 +6,14 @@
 #ifndef WebCLCommandQueue_h
 #define WebCLCommandQueue_h
 
+#include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLCallback.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/RefPtr.h>
 #include <wtf/Threading.h>
 
 namespace blink {
@@ -89,6 +91,21 @@ public:
     unsigned getProperties();
     bool isReleased() const { return !m_clCommandQueue; }
 
+    template<typename T>
+    int getInfo(unsigned name, T& info)
+    {
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetCommandQueueInfo(m_clCommandQueue, name, sizeof(T), &info, nullptr);
+    }
+    template<typename T>
+    int getInfo(unsigned name, RefPtr<T>& info)
+    {
+        return getInfoCustom(name, info);
+    }
+
 private:
     void enqueueWriteBufferBase(WebCLBuffer*, bool, unsigned, unsigned, void*, size_t, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
     void enqueueReadBufferBase(WebCLBuffer*, bool, unsigned, unsigned, void*, size_t, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
@@ -103,6 +120,14 @@ private:
     static void CL_CALLBACK callbackProxy(cl_event, cl_int, void*);
     static void callbackProxyOnMainThread(PassOwnPtr<WebCLCommandQueueHolder>);
     void resetEventAndCallback();
+
+    template<typename T>
+    int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+    int getInfoCustom(unsigned name, RefPtr<WebCLContext>&);
+    int getInfoCustom(unsigned name, RefPtr<WebCLDevice>&);
 
     Persistent<WebCLCallback> m_whenFinishCallback;
     cl_event m_eventForCallback;

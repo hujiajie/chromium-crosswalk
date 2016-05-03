@@ -1310,4 +1310,20 @@ void WebCLCommandQueue::resetEventAndCallback()
     m_whenFinishCallback.clear();
 }
 
+int WebCLCommandQueue::getInfoCustom(unsigned name, RefPtr<WebCLContext>& info)
+{
+    if (name != CL_QUEUE_CONTEXT)
+        return WebCLException::INVALID_VALUE;
+    info = context();
+    return WebCLException::SUCCESS;
+}
+
+int WebCLCommandQueue::getInfoCustom(unsigned name, RefPtr<WebCLDevice>& info)
+{
+    if (name != CL_QUEUE_DEVICE)
+        return WebCLException::INVALID_VALUE;
+    info = m_device;
+    return WebCLException::SUCCESS;
+}
+
 } // namespace blink
