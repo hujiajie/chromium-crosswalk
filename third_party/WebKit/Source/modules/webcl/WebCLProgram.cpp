@@ -506,4 +506,39 @@ void WebCLProgram::callbackProxyOnMainThread(PassOwnPtr<WebCLProgramHolder> hold
     }
 }
 
+int WebCLProgram::getInfo(unsigned name, String& info)
+{
+    int status = getInfoCustom(name, info);
+    if (status != WebCLException::INVALID_VALUE)
+        return status;
+
+    size_t sizeInBytes = 0;
+    status = clGetProgramInfo(m_clProgram, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringInfo = new char[sizeInBytes / sizeof(char)];
+        status = clGetProgramInfo(m_clProgram, name, sizeInBytes, stringInfo, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringInfo;
+        delete [] stringInfo;
+        return status;
+    }
+
+    return WebCLException::FAILURE;
+}
+
+int WebCLProgram::getInfoCustom(unsigned name, RefPtr<WebCLContext>& info)
+{
+    if (name != CL_PROGRAM_CONTEXT)
+        return WebCLException::INVALID_VALUE;
+    info = context();
+    return WebCLException::SUCCESS;
+}
+
+int WebCLProgram::getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>& info)
+{
+    if (name != CL_PROGRAM_DEVICES)
+        return WebCLException::INVALID_VALUE;
+    return context()->getInfo(CL_CONTEXT_DEVICES, info);
+}
+
 } // namespace blink
