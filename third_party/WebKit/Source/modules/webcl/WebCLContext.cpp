@@ -96,7 +96,7 @@ PassRefPtr<WebCLCommandQueue> WebCLContext::createCommandQueue(PassRefPtr<WebCLD
         }
     } else {
         selectedDevice = device;
-        clDevice = device->getDeviceId();
+        clDevice = selectedDevice->getDeviceId();
         size_t i = 0;
         for (i = 0; i < m_devices.size(); ++i) {
             if (m_devices[i]->getDeviceId() == clDevice)
