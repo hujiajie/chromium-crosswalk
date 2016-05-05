@@ -27,7 +27,7 @@ WebCLKernel::~WebCLKernel()
     ASSERT(!m_clKernel);
 }
 
-PassRefPtr<WebCLKernel> WebCLKernel::create(cl_kernel kernel, PassRefPtr<WebCLContext> context, WebCLProgram* program, const String& kernelName)
+PassRefPtr<WebCLKernel> WebCLKernel::create(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program, const String& kernelName)
 {
     return adoptRef(new WebCLKernel(kernel, context, program, kernelName));
 }
@@ -42,28 +42,32 @@ ScriptValue WebCLKernel::getInfo(ScriptState* scriptState, int kernelInfo, Excep
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    cl_uint uintUnits = 0;
+    int status;
     switch (kernelInfo) {
-    case CL_KERNEL_FUNCTION_NAME:
-        return ScriptValue(scriptState, v8String(isolate, m_kernelName));
     case CL_KERNEL_NUM_ARGS:
-        err = clGetKernelInfo(m_clKernel, CL_KERNEL_NUM_ARGS, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        break;
-    case CL_KERNEL_PROGRAM:
-        return ScriptValue(scriptState, toV8(m_program, creationContext, isolate));
-        break;
+        {
+            cl_uint info;
+            status = getInfo(kernelInfo, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_KERNEL_FUNCTION_NAME:
+        {
+            String info;
+            status = getInfo(kernelInfo, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8String(isolate, info));
+        }
     case CL_KERNEL_CONTEXT:
         return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
-        break;
+    case CL_KERNEL_PROGRAM:
+        return ScriptValue(scriptState, toV8(program(), creationContext, isolate));
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 ScriptValue WebCLKernel::getWorkGroupInfo(ScriptState* scriptState, WebCLDevice* device, int paramName, ExceptionState& es)
@@ -432,7 +436,32 @@ unsigned WebCLKernel::associatedArguments()
     return count;
 }
 
-WebCLKernel::WebCLKernel(cl_kernel kernel, PassRefPtr<WebCLContext> context, WebCLProgram* program, const String& kernelName)
+int WebCLKernel::getInfo(unsigned name, String& info)
+{
+    int status = getInfoCustom(name, info);
+    if (status != WebCLException::INVALID_VALUE)
+        return status;
+
+    size_t sizeInBytes = 0;
+    status = clGetKernelInfo(m_clKernel, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringBuffer = new char[sizeInBytes / sizeof(char)];
+        status = clGetKernelInfo(m_clKernel, name, sizeInBytes, stringBuffer, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringBuffer;
+        delete [] stringBuffer;
+        return status;
+    }
+
+    return WebCLException::FAILURE;
+}
+
+PassRefPtr<WebCLProgram> WebCLKernel::program()
+{
+    return m_program;
+}
+
+WebCLKernel::WebCLKernel(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program, const String& kernelName)
     : WebCLObject(context)
     , m_program(program)
     , m_kernelName(kernelName)

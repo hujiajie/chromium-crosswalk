@@ -6,11 +6,14 @@
 #ifndef WebCLKernel_h
 #define WebCLKernel_h
 
+#include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLKernelArgInfoProvider.h"
 #include "modules/webcl/WebCLProgram.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/RefPtr.h>
+#include <wtf/text/WTFString.h>
 
 namespace blink {
 
@@ -28,7 +31,7 @@ class WebCLKernel : public WebCLObject, public ScriptWrappable {
     DEFINE_WRAPPERTYPEINFO();
 public:
     ~WebCLKernel() override;
-    static PassRefPtr<WebCLKernel> create(cl_kernel, PassRefPtr<WebCLContext>, WebCLProgram*, const String&);
+    static PassRefPtr<WebCLKernel> create(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>, const String&);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
     ScriptValue getWorkGroupInfo(ScriptState*, WebCLDevice*, int, ExceptionState&);
@@ -42,16 +45,33 @@ public:
 
     unsigned numberOfArguments();
     unsigned associatedArguments();
-    WebCLProgram* program() const { return m_program; }
     const String& kernelName() const { return m_kernelName; }
     const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider.requiredArguments(); }
     cl_kernel getKernel() const { return m_clKernel; }
 
+    template<typename T>
+    int getInfo(unsigned name, T& info)
+    {
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetKernelInfo(m_clKernel, name, sizeof(T), &info, nullptr);
+    }
+    int getInfo(unsigned name, String& info);
+    PassRefPtr<WebCLProgram> program();
+
 private:
-    WebCLKernel(cl_kernel, PassRefPtr<WebCLContext>, WebCLProgram*, const String&);
+    WebCLKernel(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>, const String&);
     bool isReleased() const { return !m_clKernel; }
 
-    WebCLProgram* m_program;
+    template<typename T>
+    int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+
+    RefPtr<WebCLProgram> m_program;
     String m_kernelName;
     WebCLKernelArgInfoProvider m_argumentInfoProvider;
     cl_kernel m_clKernel;
