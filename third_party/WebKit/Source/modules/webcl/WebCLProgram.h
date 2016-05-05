@@ -52,17 +52,8 @@ public:
 
         return clGetProgramInfo(m_clProgram, name, sizeof(T), &info, nullptr);
     }
-    template<typename T>
-    int getInfo(unsigned name, RefPtr<T>& info)
-    {
-        return getInfoCustom(name, info);
-    }
-    template<typename T>
-    int getInfo(unsigned name, Vector<RefPtr<T>>& info)
-    {
-        return getInfoCustom(name, info);
-    }
     int getInfo(unsigned name, String& info);
+    Vector<RefPtr<WebCLDevice>> devices();
 
 private:
     WebCLProgram(cl_program, PassRefPtr<WebCLContext>, const String&);
@@ -78,8 +69,6 @@ private:
     {
         return WebCLException::INVALID_VALUE;
     }
-    int getInfoCustom(unsigned name, RefPtr<WebCLContext>&);
-    int getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>&);
 
     Persistent<WebCLCallback> m_buildCallback;
     String m_programSource;

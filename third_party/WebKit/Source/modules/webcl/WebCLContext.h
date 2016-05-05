@@ -86,11 +86,7 @@ public:
 
         return clGetContextInfo(m_clContext, name, sizeof(T), &info, nullptr);
     }
-    template<typename T>
-    int getInfo(unsigned name, Vector<RefPtr<T>>& info)
-    {
-        return getInfoCustom(name, info);
-    }
+    Vector<RefPtr<WebCLDevice>> devices();
 
 private:
     WebCLContext(cl_context, WebCL*, const Vector<RefPtr<WebCLDevice>>&, HashSet<String>&);
@@ -106,7 +102,6 @@ private:
     {
         return WebCLException::INVALID_VALUE;
     }
-    int getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>&);
 
     Vector<RefPtr<WebCLDevice>> m_devices;
     HashSet<String> m_enabledExtensions;

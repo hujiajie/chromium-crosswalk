@@ -101,14 +101,6 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, int paramName, Excep
 
     int status;
     switch(paramName) {
-    case CL_PROGRAM_CONTEXT:
-        {
-            RefPtr<WebCLContext> info;
-            status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
-        }
     case CL_PROGRAM_NUM_DEVICES:
         {
             cl_uint info;
@@ -116,14 +108,6 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, int paramName, Excep
             if (status != WebCLException::SUCCESS)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
-        }
-    case CL_PROGRAM_DEVICES:
-        {
-            Vector<RefPtr<WebCLDevice>> info;
-            status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
         }
     case CL_PROGRAM_SOURCE:
         {
@@ -133,6 +117,10 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, int paramName, Excep
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8String(isolate, info));
         }
+    case CL_PROGRAM_CONTEXT:
+        return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
+    case CL_PROGRAM_DEVICES:
+        return ScriptValue(scriptState, toV8(devices(), creationContext, isolate));
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
@@ -156,8 +144,7 @@ ScriptValue WebCLProgram::getBuildInfo(ScriptState* scriptState, WebCLDevice* de
             return ScriptValue(scriptState, v8::Null(isolate));
         }
         size_t i = 0;
-        Vector<RefPtr<WebCLDevice>> deviceList;
-        context()->getInfo(CL_CONTEXT_DEVICES, deviceList);
+        Vector<RefPtr<WebCLDevice>> deviceList = context()->devices();
         for (; i < deviceList.size(); i ++) {
             if (clDevice == deviceList[i]->getDeviceId())
                 break;
@@ -407,8 +394,7 @@ void WebCLProgram::build(const Vector<RefPtr<WebCLDevice>>& devices, const Strin
 
     cl_int err = CL_SUCCESS;
     Vector<cl_device_id> clDevices;
-    Vector<RefPtr<WebCLDevice>> contextDevices;
-    context()->getInfo(CL_CONTEXT_DEVICES, contextDevices);
+    Vector<RefPtr<WebCLDevice>> contextDevices = context()->devices();
     if (devices.size()) {
         Vector<cl_device_id> inputDevices;
         for (auto device : devices)
@@ -542,19 +528,9 @@ int WebCLProgram::getInfo(unsigned name, String& info)
     return WebCLException::FAILURE;
 }
 
-int WebCLProgram::getInfoCustom(unsigned name, RefPtr<WebCLContext>& info)
+Vector<RefPtr<WebCLDevice>> WebCLProgram::devices()
 {
-    if (name != CL_PROGRAM_CONTEXT)
-        return WebCLException::INVALID_VALUE;
-    info = context();
-    return WebCLException::SUCCESS;
-}
-
-int WebCLProgram::getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>& info)
-{
-    if (name != CL_PROGRAM_DEVICES)
-        return WebCLException::INVALID_VALUE;
-    return context()->getInfo(CL_CONTEXT_DEVICES, info);
+    return context()->devices();
 }
 
 } // namespace blink

@@ -189,13 +189,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
             return ScriptValue(scriptState, toV8(info, creationContext, isolate));
         }
     case CL_DEVICE_PLATFORM:
-        {
-            RefPtr<WebCLPlatform> info;
-            status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
-        }
+        return ScriptValue(scriptState, toV8(platform(), creationContext, isolate));
     case CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:
     case CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:
         {
@@ -306,12 +300,9 @@ int WebCLDevice::getInfoCustom(unsigned name, String& info)
     }
 }
 
-int WebCLDevice::getInfoCustom(unsigned name, RefPtr<WebCLPlatform>& info)
+PassRefPtr<WebCLPlatform> WebCLDevice::platform()
 {
-    if (name != CL_DEVICE_PLATFORM)
-        return WebCLException::INVALID_VALUE;
-    info = m_platform;
-    return WebCLException::SUCCESS;
+    return m_platform;
 }
 
 WebCLDevice::WebCLDevice(cl_device_id device, WebCLPlatform* platform)

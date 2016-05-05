@@ -63,13 +63,7 @@ ScriptValue WebCLContext::getInfo(ScriptState* scriptState, int paramName, Excep
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_CONTEXT_DEVICES:
-        {
-            Vector<RefPtr<WebCLDevice>> info;
-            status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
-        }
+        return ScriptValue(scriptState, toV8(devices(), creationContext, isolate));
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
@@ -734,12 +728,9 @@ bool WebCLContext::isExtensionEnabled(const String& name) const
     return m_enabledExtensions.contains(name);
 }
 
-int WebCLContext::getInfoCustom(unsigned name, Vector<RefPtr<WebCLDevice>>& info)
+Vector<RefPtr<WebCLDevice>> WebCLContext::devices()
 {
-    if (name != CL_CONTEXT_DEVICES)
-        return WebCLException::INVALID_VALUE;
-    info = m_devices;
-    return WebCLException::SUCCESS;
+    return m_devices;
 }
 
 } // namespace blink

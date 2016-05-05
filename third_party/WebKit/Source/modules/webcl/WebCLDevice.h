@@ -14,7 +14,7 @@
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
+#include <wtf/PassRefPtr.h>
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 
@@ -50,11 +50,6 @@ public:
         return clGetDeviceInfo(m_clDeviceId, name, sizeof(T), &info, nullptr);
     }
     template<typename T>
-    int getInfo(unsigned name, RefPtr<T>& info)
-    {
-        return getInfoCustom(name, info);
-    }
-    template<typename T>
     int getInfo(unsigned name, Vector<T>& info)
     {
         int status = getInfoCustom(name, info);
@@ -71,6 +66,7 @@ public:
         return WebCLException::FAILURE;
     }
     int getInfo(unsigned name, String&);
+    PassRefPtr<WebCLPlatform> platform();
 
 private:
     WebCLDevice(cl_device_id, WebCLPlatform* platform);
@@ -82,7 +78,6 @@ private:
     }
     int getInfoCustom(unsigned name, cl_device_exec_capabilities&);
     int getInfoCustom(unsigned name, String&);
-    int getInfoCustom(unsigned name, RefPtr<WebCLPlatform>&);
 
     WebCLPlatform* m_platform;
     WebCLExtension m_extension;

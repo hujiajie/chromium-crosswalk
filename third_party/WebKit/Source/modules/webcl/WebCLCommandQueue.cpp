@@ -14,6 +14,7 @@
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLBuffer.h"
 #include "modules/webcl/WebCLCommandQueue.h"
+#include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLEvent.h"
 #include "modules/webcl/WebCLHTMLUtil.h"
 #include "modules/webcl/WebCLImage.h"
@@ -58,22 +59,6 @@ ScriptValue WebCLCommandQueue::getInfo(ScriptState* scriptState, int paramName, 
 
     int status;
     switch(paramName) {
-    case CL_QUEUE_CONTEXT:
-        {
-            RefPtr<WebCLContext> info;
-            status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
-        }
-    case CL_QUEUE_DEVICE:
-        {
-            RefPtr<WebCLDevice> info;
-            status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
-                WebCLException::throwException(status, es);
-            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
-        }
     case CL_QUEUE_PROPERTIES:
         {
             cl_command_queue_properties info;
@@ -82,6 +67,10 @@ ScriptValue WebCLCommandQueue::getInfo(ScriptState* scriptState, int paramName, 
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
+    case CL_QUEUE_CONTEXT:
+        return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
+    case CL_QUEUE_DEVICE:
+        return ScriptValue(scriptState, toV8(device(), creationContext, isolate));
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
@@ -1309,20 +1298,9 @@ void WebCLCommandQueue::resetEventAndCallback()
     m_whenFinishCallback.clear();
 }
 
-int WebCLCommandQueue::getInfoCustom(unsigned name, RefPtr<WebCLContext>& info)
+PassRefPtr<WebCLDevice> WebCLCommandQueue::device()
 {
-    if (name != CL_QUEUE_CONTEXT)
-        return WebCLException::INVALID_VALUE;
-    info = context();
-    return WebCLException::SUCCESS;
-}
-
-int WebCLCommandQueue::getInfoCustom(unsigned name, RefPtr<WebCLDevice>& info)
-{
-    if (name != CL_QUEUE_DEVICE)
-        return WebCLException::INVALID_VALUE;
-    info = m_device;
-    return WebCLException::SUCCESS;
+    return m_device;
 }
 
 } // namespace blink

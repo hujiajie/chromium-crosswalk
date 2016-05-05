@@ -99,11 +99,7 @@ public:
 
         return clGetCommandQueueInfo(m_clCommandQueue, name, sizeof(T), &info, nullptr);
     }
-    template<typename T>
-    int getInfo(unsigned name, RefPtr<T>& info)
-    {
-        return getInfoCustom(name, info);
-    }
+    PassRefPtr<WebCLDevice> device();
 
 private:
     void enqueueWriteBufferBase(WebCLBuffer*, bool, unsigned, unsigned, void*, size_t, const Vector<RefPtr<WebCLEvent>>&, WebCLEvent*, ExceptionState&);
@@ -125,8 +121,6 @@ private:
     {
         return WebCLException::INVALID_VALUE;
     }
-    int getInfoCustom(unsigned name, RefPtr<WebCLContext>&);
-    int getInfoCustom(unsigned name, RefPtr<WebCLDevice>&);
 
     Persistent<WebCLCallback> m_whenFinishCallback;
     cl_event m_eventForCallback;
