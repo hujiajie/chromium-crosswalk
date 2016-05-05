@@ -730,6 +730,8 @@ bool WebCLContext::isExtensionEnabled(const String& name) const
 
 Vector<RefPtr<WebCLDevice>> WebCLContext::devices()
 {
+    ASSERT(!isReleased());
+
     return m_devices;
 }
 

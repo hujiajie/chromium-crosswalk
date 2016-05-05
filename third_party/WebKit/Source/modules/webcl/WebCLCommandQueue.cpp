@@ -1302,6 +1302,8 @@ void WebCLCommandQueue::resetEventAndCallback()
 
 PassRefPtr<WebCLDevice> WebCLCommandQueue::device()
 {
+    ASSERT(!isReleased());
+
     return m_device;
 }
 

@@ -46,6 +46,8 @@ public:
     template<typename T>
     int getInfo(unsigned name, T& info)
     {
+        ASSERT(!isReleased());
+
         int status = getInfoCustom(name, info);
         if (status != WebCLException::INVALID_VALUE)
             return status;
@@ -58,6 +60,8 @@ public:
     template<typename T>
     int getBuildInfo(WebCLDevice* device, unsigned name, T& info)
     {
+        ASSERT(!isReleased());
+
         int status = getBuildInfoCustom(device, name, info);
         if (status != WebCLException::INVALID_VALUE)
             return status;

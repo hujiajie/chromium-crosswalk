@@ -433,6 +433,8 @@ unsigned WebCLKernel::associatedArguments()
 
 int WebCLKernel::getInfo(unsigned name, String& info)
 {
+    ASSERT(!isReleased());
+
     int status = getInfoCustom(name, info);
     if (status != WebCLException::INVALID_VALUE)
         return status;
@@ -453,6 +455,8 @@ int WebCLKernel::getInfo(unsigned name, String& info)
 
 PassRefPtr<WebCLProgram> WebCLKernel::program()
 {
+    ASSERT(!isReleased());
+
     return m_program;
 }
 

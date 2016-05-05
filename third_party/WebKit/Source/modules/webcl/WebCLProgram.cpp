@@ -467,6 +467,8 @@ void WebCLProgram::callbackProxyOnMainThread(PassOwnPtr<WebCLProgramHolder> hold
 
 int WebCLProgram::getInfo(unsigned name, String& info)
 {
+    ASSERT(!isReleased());
+
     int status = getInfoCustom(name, info);
     if (status != WebCLException::INVALID_VALUE)
         return status;
@@ -487,11 +489,15 @@ int WebCLProgram::getInfo(unsigned name, String& info)
 
 Vector<RefPtr<WebCLDevice>> WebCLProgram::devices()
 {
+    ASSERT(!isReleased());
+
     return context()->devices();
 }
 
 int WebCLProgram::getBuildInfo(WebCLDevice* device, unsigned name, String& info)
 {
+    ASSERT(!isReleased());
+
     int status = getBuildInfoCustom(device, name, info);
     if (status != WebCLException::INVALID_VALUE)
         return status;

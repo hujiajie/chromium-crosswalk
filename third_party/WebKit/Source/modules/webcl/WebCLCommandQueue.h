@@ -93,6 +93,8 @@ public:
     template<typename T>
     int getInfo(unsigned name, T& info)
     {
+        ASSERT(!isReleased());
+
         int status = getInfoCustom(name, info);
         if (status != WebCLException::INVALID_VALUE)
             return status;
