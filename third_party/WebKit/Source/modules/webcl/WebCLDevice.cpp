@@ -9,6 +9,7 @@
 #include "modules/webcl/WebCLContext.h"
 #include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLOpenCL.h"
+#include "modules/webcl/WebCLPlatform.h"
 
 namespace blink {
 

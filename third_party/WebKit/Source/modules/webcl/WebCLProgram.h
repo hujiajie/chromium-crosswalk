@@ -9,6 +9,7 @@
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLCallback.h"
+#include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLObject.h"
 
 #include <wtf/PassRefPtr.h>
@@ -23,7 +24,6 @@ namespace blink {
 class ExceptionState;
 class WebCL;
 class WebCLContext;
-class WebCLDevice;
 class WebCLKernel;
 class WebCLProgramHolder;
 
@@ -55,6 +55,17 @@ public:
     int getInfo(unsigned name, String& info);
     Vector<RefPtr<WebCLDevice>> devices();
 
+    template<typename T>
+    int getBuildInfo(WebCLDevice* device, unsigned name, T& info)
+    {
+        int status = getBuildInfoCustom(device, name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetProgramBuildInfo(m_clProgram, device->getDeviceId(), name, sizeof(T), &info, nullptr);
+    }
+    int getBuildInfo(WebCLDevice*, unsigned name, String& info);
+
 private:
     WebCLProgram(cl_program, PassRefPtr<WebCLContext>, const String&);
     bool isReleased() const { return !m_clProgram; }
@@ -66,6 +77,12 @@ private:
 
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+
+    template<typename T>
+    int getBuildInfoCustom(WebCLDevice* device, unsigned name, T& info)
     {
         return WebCLException::INVALID_VALUE;
     }

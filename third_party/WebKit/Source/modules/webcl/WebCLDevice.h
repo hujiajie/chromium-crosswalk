@@ -10,7 +10,6 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
 #include "modules/webcl/WebCLOpenCL.h"
-#include "modules/webcl/WebCLPlatform.h"
 
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>

@@ -136,17 +136,11 @@ ScriptValue WebCLProgram::getBuildInfo(ScriptState* scriptState, WebCLDevice* de
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_device_id clDevice = nullptr;
     if (device) {
-        clDevice = device->getDeviceId();
-        if (!clDevice) {
-            es.throwWebCLException(WebCLException::INVALID_DEVICE, WebCLException::invalidDeviceMessage);
-            return ScriptValue(scriptState, v8::Null(isolate));
-        }
         size_t i = 0;
         Vector<RefPtr<WebCLDevice>> deviceList = context()->devices();
         for (; i < deviceList.size(); i ++) {
-            if (clDevice == deviceList[i]->getDeviceId())
+            if (device == deviceList[i])
                 break;
         }
         if (i == deviceList.size()) {
@@ -155,47 +149,29 @@ ScriptValue WebCLProgram::getBuildInfo(ScriptState* scriptState, WebCLDevice* de
         }
     }
 
-    cl_int err = CL_SUCCESS;
-    char *buffer;
-    size_t len = 0;
+    int status;
     switch (paramName) {
-    case CL_PROGRAM_BUILD_LOG: {
-        err = clGetProgramBuildInfo(m_clProgram, clDevice, CL_PROGRAM_BUILD_LOG, 0, nullptr, &len);
-        if (err != CL_SUCCESS)
-            break;
-        buffer = new char[len + 1];
-        err = clGetProgramBuildInfo(m_clProgram, clDevice, CL_PROGRAM_BUILD_LOG, len, buffer, nullptr);
-        if (err != CL_SUCCESS)
-            break;
-        String result(buffer);
-        delete [] buffer;
-        return ScriptValue(scriptState, v8String(isolate, result));
-    }
-    case CL_PROGRAM_BUILD_OPTIONS: {
-        err = clGetProgramBuildInfo(m_clProgram, clDevice, CL_PROGRAM_BUILD_OPTIONS, 0, nullptr, &len);
-        if (err != CL_SUCCESS)
-            break;
-        buffer = new char[len + 1];
-        err = clGetProgramBuildInfo(m_clProgram, clDevice, CL_PROGRAM_BUILD_OPTIONS, len, buffer, nullptr);
-        if (err != CL_SUCCESS)
-            break;
-        String result(buffer);
-        delete [] buffer;
-        return ScriptValue(scriptState, v8String(isolate, result));
-    }
     case CL_PROGRAM_BUILD_STATUS:
-        cl_build_status buildStatus;
-        err = clGetProgramBuildInfo(m_clProgram, clDevice, CL_PROGRAM_BUILD_STATUS, sizeof(cl_build_status), &buildStatus, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(buildStatus)));
-        break;
+        {
+            cl_build_status info;
+            status = getBuildInfo(device, paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::New(isolate, static_cast<int>(info)));
+        }
+    case CL_PROGRAM_BUILD_OPTIONS:
+    case CL_PROGRAM_BUILD_LOG:
+        {
+            String info;
+            status = getBuildInfo(device, paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8String(isolate, info));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 PassRefPtr<WebCLKernel> WebCLProgram::createKernel(const String& kernelName, ExceptionState& es)
@@ -531,6 +507,27 @@ int WebCLProgram::getInfo(unsigned name, String& info)
 Vector<RefPtr<WebCLDevice>> WebCLProgram::devices()
 {
     return context()->devices();
+}
+
+int WebCLProgram::getBuildInfo(WebCLDevice* device, unsigned name, String& info)
+{
+    int status = getBuildInfoCustom(device, name, info);
+    if (status != WebCLException::INVALID_VALUE)
+        return status;
+
+    cl_device_id clDeviceId = device->getDeviceId();
+    size_t sizeInBytes = 0;
+    status = clGetProgramBuildInfo(m_clProgram, clDeviceId, name, 0, nullptr, &sizeInBytes);
+    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+        char* stringBuffer = new char[sizeInBytes / sizeof(char)];
+        status = clGetProgramBuildInfo(m_clProgram, clDeviceId, name, sizeInBytes, stringBuffer, nullptr);
+        if (status == WebCLException::SUCCESS)
+            info = stringBuffer;
+        delete [] stringBuffer;
+        return status;
+    }
+
+    return WebCLException::FAILURE;
 }
 
 } // namespace blink
