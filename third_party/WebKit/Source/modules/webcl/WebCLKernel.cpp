@@ -167,7 +167,7 @@ WebCLKernelArgInfo* WebCLKernel::getArgInfo(unsigned index, ExceptionState& es)
         return nullptr;
     }
 
-    return m_argumentInfoProvider.argumentsInfo().at(index).get();
+    return m_argumentInfoProvider->argumentsInfo().at(index).get();
 }
 
 void WebCLKernel::setArg(unsigned index, const ScriptValue& value, ExceptionState& es)
@@ -424,8 +424,8 @@ void WebCLKernel::release()
 unsigned WebCLKernel::associatedArguments()
 {
     unsigned count = 0;
-    for (unsigned i = 0; i < m_argumentInfoProvider.numberOfArguments(); i ++) {
-        if (m_argumentInfoProvider.argumentsInfo()[i]->isAssociated())
+    for (unsigned i = 0; i < m_argumentInfoProvider->numberOfArguments(); i ++) {
+        if (m_argumentInfoProvider->argumentsInfo()[i]->isAssociated())
             count ++;
     }
     return count;
@@ -459,9 +459,9 @@ PassRefPtr<WebCLProgram> WebCLKernel::program()
 WebCLKernel::WebCLKernel(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program)
     : WebCLObject(context)
     , m_program(program)
-    , m_argumentInfoProvider(this)
     , m_clKernel(kernel)
 {
+    m_argumentInfoProvider = adoptPtr(new WebCLKernelArgInfoProvider(this));
 }
 
 } // namespace blink

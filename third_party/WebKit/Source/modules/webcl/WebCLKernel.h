@@ -10,6 +10,7 @@
 #include "modules/webcl/WebCLKernelArgInfoProvider.h"
 #include "modules/webcl/WebCLProgram.h"
 
+#include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -44,7 +45,7 @@ public:
     void release() override;
 
     unsigned associatedArguments();
-    const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider.requiredArguments(); }
+    const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider->requiredArguments(); }
     cl_kernel getKernel() const { return m_clKernel; }
 
     template<typename T>
@@ -70,7 +71,7 @@ private:
     }
 
     RefPtr<WebCLProgram> m_program;
-    WebCLKernelArgInfoProvider m_argumentInfoProvider;
+    OwnPtr<WebCLKernelArgInfoProvider> m_argumentInfoProvider;
     cl_kernel m_clKernel;
 };
 
