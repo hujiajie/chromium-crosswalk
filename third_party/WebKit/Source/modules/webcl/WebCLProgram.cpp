@@ -199,7 +199,7 @@ PassRefPtr<WebCLKernel> WebCLProgram::createKernel(const String& kernelName, Exc
         WebCLException::throwException(err, es);
         return nullptr;
     }
-    RefPtr<WebCLKernel> kernel = WebCLKernel::create(clKernelId, context(), this, kernelName);
+    RefPtr<WebCLKernel> kernel = WebCLKernel::create(clKernelId, context(), this);
     return kernel;
 }
 
@@ -239,30 +239,11 @@ Vector<RefPtr<WebCLKernel>> WebCLProgram::createKernelsInProgram(ExceptionState&
         return Vector<RefPtr<WebCLKernel>>();
     }
 
-    Vector<char> kernelName;
-    size_t bytesOfKernelName = 0;
     Vector<RefPtr<WebCLKernel>> m_kernelList;
     for (size_t i = 0 ; i < num; i++) {
-        err = clGetKernelInfo(kernelBuf[i], CL_KERNEL_FUNCTION_NAME, 0, nullptr, &bytesOfKernelName);
-        if (err != CL_SUCCESS) {
-            continue;
-        }
-
-        kernelName.reserveCapacity(bytesOfKernelName);
-        kernelName.resize(bytesOfKernelName);
-
-        err = clGetKernelInfo(kernelBuf[i], CL_KERNEL_FUNCTION_NAME, bytesOfKernelName, kernelName.data(), 0);
-
-        if (err != CL_SUCCESS) {
-            continue;
-        }
-
-        RefPtr<WebCLKernel> kernel = WebCLKernel::create(kernelBuf[i], context(), this, static_cast<const char*>(kernelName.data()));
-
+        RefPtr<WebCLKernel> kernel = WebCLKernel::create(kernelBuf[i], context(), this);
         if (kernel)
             m_kernelList.append(kernel);
-        kernelName.clear();
-        bytesOfKernelName = 0;
     }
 
     return m_kernelList;

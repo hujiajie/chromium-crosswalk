@@ -31,7 +31,7 @@ class WebCLKernel : public WebCLObject, public ScriptWrappable {
     DEFINE_WRAPPERTYPEINFO();
 public:
     ~WebCLKernel() override;
-    static PassRefPtr<WebCLKernel> create(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>, const String&);
+    static PassRefPtr<WebCLKernel> create(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
     ScriptValue getWorkGroupInfo(ScriptState*, WebCLDevice*, int, ExceptionState&);
@@ -60,7 +60,7 @@ public:
     PassRefPtr<WebCLProgram> program();
 
 private:
-    WebCLKernel(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>, const String&);
+    WebCLKernel(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>);
     bool isReleased() const { return !m_clKernel; }
 
     template<typename T>
@@ -70,7 +70,6 @@ private:
     }
 
     RefPtr<WebCLProgram> m_program;
-    String m_kernelName;
     WebCLKernelArgInfoProvider m_argumentInfoProvider;
     cl_kernel m_clKernel;
 };

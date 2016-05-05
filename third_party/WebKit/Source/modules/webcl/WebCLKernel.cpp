@@ -27,9 +27,9 @@ WebCLKernel::~WebCLKernel()
     ASSERT(!m_clKernel);
 }
 
-PassRefPtr<WebCLKernel> WebCLKernel::create(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program, const String& kernelName)
+PassRefPtr<WebCLKernel> WebCLKernel::create(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program)
 {
-    return adoptRef(new WebCLKernel(kernel, context, program, kernelName));
+    return adoptRef(new WebCLKernel(kernel, context, program));
 }
 
 ScriptValue WebCLKernel::getInfo(ScriptState* scriptState, int kernelInfo, ExceptionState& es)
@@ -456,10 +456,9 @@ PassRefPtr<WebCLProgram> WebCLKernel::program()
     return m_program;
 }
 
-WebCLKernel::WebCLKernel(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program, const String& kernelName)
+WebCLKernel::WebCLKernel(cl_kernel kernel, PassRefPtr<WebCLContext> context, PassRefPtr<WebCLProgram> program)
     : WebCLObject(context)
     , m_program(program)
-    , m_kernelName(kernelName)
     , m_argumentInfoProvider(this)
     , m_clKernel(kernel)
 {

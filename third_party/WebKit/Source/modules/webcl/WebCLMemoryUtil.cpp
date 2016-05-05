@@ -64,14 +64,14 @@ void WebCLMemoryUtil::ensureMemory(WebCLMemoryObject* memoryObject, WebCLCommand
             return;
         }
 
-        m_kernelChar16 = WebCLKernel::create(clKernelId16, m_context, m_program.get(), String("init16"));
+        m_kernelChar16 = WebCLKernel::create(clKernelId16, m_context, m_program);
         cl_kernel clKernelId = clCreateKernel(clProgramId, "init", &err);
         if (err != CL_SUCCESS) {
             WebCLException::throwException(err, es);
             return;
         }
 
-        m_kernelChar = WebCLKernel::create(clKernelId, m_context, m_program.get(), String("init"));
+        m_kernelChar = WebCLKernel::create(clKernelId, m_context, m_program);
     }
 
     unsigned count = memoryObject->sizeInBytes() / 16;
