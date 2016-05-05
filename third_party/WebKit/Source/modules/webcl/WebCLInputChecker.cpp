@@ -192,7 +192,9 @@ bool isValidCommandQueueProperty(unsigned value)
 bool isValidKernelArgIndex(WebCLKernel* kernel, unsigned index)
 {
     ASSERT(kernel);
-    return index < kernel->numberOfArguments();
+    cl_uint numberOfArguments;
+    kernel->getInfo(CL_KERNEL_NUM_ARGS, numberOfArguments);
+    return index < numberOfArguments;
 }
 
 bool isValidDataSizeForDOMArrayBufferView(unsigned size, DOMArrayBufferView* arrayBufferView)

@@ -421,11 +421,6 @@ void WebCLKernel::release()
     m_clKernel = 0;
 }
 
-unsigned WebCLKernel::numberOfArguments()
-{
-    return m_argumentInfoProvider.numberOfArguments();
-}
-
 unsigned WebCLKernel::associatedArguments()
 {
     unsigned count = 0;

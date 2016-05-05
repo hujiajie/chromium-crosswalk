@@ -43,7 +43,6 @@ public:
     void setArg(unsigned, size_t, const void*, ExceptionState&);
     void release() override;
 
-    unsigned numberOfArguments();
     unsigned associatedArguments();
     const String& kernelName() const { return m_kernelName; }
     const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider.requiredArguments(); }

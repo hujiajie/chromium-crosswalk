@@ -719,7 +719,9 @@ void WebCLCommandQueue::enqueueNDRangeKernel(WebCLKernel* kernel, unsigned dim, 
         return;
     }
 
-    if (kernel->numberOfArguments() != kernel->associatedArguments()) {
+    cl_uint numberOfArguments;
+    kernel->getInfo(CL_KERNEL_NUM_ARGS, numberOfArguments);
+    if (numberOfArguments != kernel->associatedArguments()) {
         es.throwWebCLException(WebCLException::INVALID_KERNEL_ARGS, WebCLException::invalidKernelArgsMessage);
         return;
     }
