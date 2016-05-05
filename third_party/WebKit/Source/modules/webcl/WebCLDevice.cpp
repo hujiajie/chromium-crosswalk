@@ -270,11 +270,11 @@ int WebCLDevice::getInfo(unsigned name, String& info)
     size_t sizeInBytes = 0;
     status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
     if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
-        char* stringInfo = new char[sizeInBytes / sizeof(char)];
-        status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringInfo, nullptr);
+        char* stringBuffer = new char[sizeInBytes / sizeof(char)];
+        status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringBuffer, nullptr);
         if (status == WebCLException::SUCCESS)
-            info = stringInfo;
-        delete [] stringInfo;
+            info = stringBuffer;
+        delete [] stringBuffer;
         return status;
     }
 
