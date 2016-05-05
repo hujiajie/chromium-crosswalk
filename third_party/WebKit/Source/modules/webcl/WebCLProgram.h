@@ -42,7 +42,6 @@ public:
     void release() override;
 
     const String& sourceWithCommentsStripped();
-    const String& getProgramSource() const { return m_programSource; }
 
     template<typename T>
     int getInfo(unsigned name, T& info)
