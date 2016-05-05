@@ -44,7 +44,6 @@ public:
     void release() override;
 
     unsigned associatedArguments();
-    const String& kernelName() const { return m_kernelName; }
     const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider.requiredArguments(); }
     cl_kernel getKernel() const { return m_clKernel; }
 
