@@ -99,24 +99,40 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, int paramName, Excep
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    cl_uint uintUnits = 0;
-    Vector<RefPtr<WebCLDevice>> result;
-    context()->getInfo(CL_CONTEXT_DEVICES, result);
-
+    int status;
     switch(paramName) {
-    case CL_PROGRAM_NUM_DEVICES:
-        err = clGetProgramInfo(m_clProgram, CL_PROGRAM_NUM_DEVICES, sizeof(cl_uint), &uintUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(uintUnits)));
-        WebCLException::throwException(err, es);
-        return ScriptValue(scriptState, v8::Null(isolate));
-    case CL_PROGRAM_SOURCE:
-        return ScriptValue(scriptState, v8String(isolate, m_programSource));
     case CL_PROGRAM_CONTEXT:
-        return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
+        {
+            RefPtr<WebCLContext> info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
+    case CL_PROGRAM_NUM_DEVICES:
+        {
+            cl_uint info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_PROGRAM_DEVICES:
-        return ScriptValue(scriptState, toV8(result, creationContext, isolate));
+        {
+            Vector<RefPtr<WebCLDevice>> info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
+    case CL_PROGRAM_SOURCE:
+        {
+            String info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8String(isolate, info));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
