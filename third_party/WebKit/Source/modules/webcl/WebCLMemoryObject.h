@@ -6,6 +6,7 @@
 #ifndef WebCLMemoryObject_h
 #define WebCLMemoryObject_h
 
+#include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
 
@@ -39,8 +40,27 @@ public:
     cl_mem getMem() const { return m_clMem; }
     bool isReleased() const { return !m_clMem; }
 
+    template<typename T>
+    int getInfo(unsigned name, T& info)
+    {
+        ASSERT(!isReleased());
+
+        int status = getInfoCustom(name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetMemObjectInfo(m_clMem, name, sizeof(T), &info, nullptr);
+    }
+    PassRefPtr<WebCLMemoryObject> associatedMemObject();
+
 protected:
     WebCLMemoryObject(cl_mem, unsigned, PassRefPtr<WebCLContext>, WebCLMemoryObject* parentBuffer = nullptr);
+
+    template<typename T>
+    int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
 
     WebCLMemoryObject* m_parentMemObject;
     size_t m_sizeInBytes;

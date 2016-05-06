@@ -33,47 +33,46 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    size_t sizetUnits = 0;
-    size_t memorySizeValue = 0;
-    cl_mem_object_type memType = 0;
-    cl_mem_flags memFlags = 0;
-    unsigned memCopyHostPtrMask = 0x07;
-
+    int status;
     switch(paramName) {
     case CL_MEM_SIZE:
-        err = clGetMemObjectInfo(m_clMem, CL_MEM_SIZE, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_MEM_FLAGS:
-        err = clGetMemObjectInfo(m_clMem, CL_MEM_FLAGS, sizeof(cl_mem_flags), &memFlags, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(memFlags & memCopyHostPtrMask)));
-        break;
     case CL_MEM_OFFSET:
-        err = clGetMemObjectInfo(m_clMem, CL_MEM_OFFSET, sizeof(size_t), &memorySizeValue, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(memorySizeValue)));
-        break;
+        {
+            size_t info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_MEM_TYPE:
-        err = clGetMemObjectInfo(m_clMem, CL_MEM_TYPE, sizeof(cl_mem_object_type), &memType, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(memType)));
-        break;
+        {
+            cl_mem_object_type info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_MEM_FLAGS:
+        {
+            cl_mem_flags info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_MEM_CONTEXT:
         return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
     case CL_MEM_ASSOCIATED_MEMOBJECT:
-        if (m_parentMemObject)
-            return ScriptValue(scriptState, toV8(m_parentMemObject, creationContext, isolate));
-        return ScriptValue(scriptState, v8::Null(isolate));
+        {
+            RefPtr<WebCLMemoryObject> memoryObject = associatedMemObject();
+            if (!memoryObject)
+                return ScriptValue(scriptState, v8::Null(isolate));
+            return ScriptValue(scriptState, toV8(memoryObject, creationContext, isolate));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 void WebCLMemoryObject::release()
@@ -86,6 +85,13 @@ void WebCLMemoryObject::release()
         ASSERT_NOT_REACHED();
 
     m_clMem = 0;
+}
+
+PassRefPtr<WebCLMemoryObject> WebCLMemoryObject::associatedMemObject()
+{
+    ASSERT(!isReleased());
+
+    return m_parentMemObject;
 }
 
 WebCLMemoryObject::WebCLMemoryObject(cl_mem mem, unsigned sizeInBytes, PassRefPtr<WebCLContext> context, WebCLMemoryObject* parentBuffer)
