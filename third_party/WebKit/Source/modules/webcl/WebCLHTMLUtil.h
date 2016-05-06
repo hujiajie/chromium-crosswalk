@@ -6,7 +6,8 @@
 #ifndef WebCLHTMLUtil_h
 #define WebCLHTMLUtil_h
 
-#include <wtf/RefCounted.h>
+#include "wtf/RefCounted.h"
+#include "wtf/Vector.h"
 
 namespace blink {
 
@@ -14,7 +15,10 @@ class ExceptionState;
 class HTMLCanvasElement;
 class HTMLImageElement;
 class HTMLVideoElement;
+class Image;
+class ImageBuffer;
 class ImageData;
+class IntSize;
 
 class WebCLHTMLUtil {
 public:

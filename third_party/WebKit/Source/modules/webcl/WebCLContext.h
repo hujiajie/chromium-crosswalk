@@ -11,11 +11,11 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLOpenCL.h"
-#include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
-#include <wtf/PassRefPtr.h>
-#include <wtf/Vector.h>
-#include <wtf/WeakPtr.h>
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
+#include "wtf/RefPtr.h"
+#include "wtf/Vector.h"
+#include "wtf/WeakPtr.h"
 
 namespace blink {
 
@@ -49,7 +49,7 @@ public:
     PassRefPtr<WebCLCommandQueue> createCommandQueue(PassRefPtr<WebCLDevice>, unsigned, ExceptionState&);
     PassRefPtr<WebCLCommandQueue> createCommandQueue(int, ExceptionState&);
     PassRefPtr<WebCLCommandQueue> createCommandQueue(PassRefPtr<WebCLDevice>, ExceptionState&);
-    PassRefPtr<WebCLCommandQueue> createCommandQueue(ExceptionState& es);
+    PassRefPtr<WebCLCommandQueue> createCommandQueue(ExceptionState&);
     PassRefPtr<WebCLProgram> createProgram(const String&, ExceptionState&);
     PassRefPtr<WebCLSampler> createSampler(bool, unsigned, unsigned, ExceptionState&);
     PassRefPtr<WebCLUserEvent> createUserEvent(ExceptionState&);
@@ -84,7 +84,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetContextInfo(m_clContext, name, sizeof(T), &info, nullptr);
@@ -103,7 +103,7 @@ private:
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     Vector<RefPtr<WebCLDevice>> m_devices;

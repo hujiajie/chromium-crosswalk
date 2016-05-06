@@ -3,11 +3,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLDevice.h"
+
 #include "bindings/modules/v8/V8WebCLPlatform.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLContext.h"
-#include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLPlatform.h"
 
 namespace blink {
@@ -39,12 +40,12 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
     v8::Isolate* isolate = scriptState->isolate();
 
     if (!m_clDeviceId) {
-        es.throwWebCLException(WebCLException::INVALID_DEVICE, WebCLException::invalidDeviceMessage);
+        es.throwWebCLException(WebCLException::InvalidDevice, WebCLException::invalidDeviceMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
     if (!WebCLInputChecker::isValidDeviceInfoType(name)) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
@@ -59,7 +60,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_bool info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(info)));
         }
@@ -87,7 +88,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_uint info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -99,7 +100,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_ulong info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -114,7 +115,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             size_t info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -122,7 +123,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_device_type info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -130,7 +131,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_device_fp_config info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -138,7 +139,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_device_mem_cache_type info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -146,7 +147,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_device_local_mem_type info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -154,7 +155,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_device_exec_capabilities info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -162,7 +163,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             cl_command_queue_properties info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -176,7 +177,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             String info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8String(isolate, info));
         }
@@ -184,7 +185,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
         {
             Vector<size_t> info;
             status = getInfo(name, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, toV8(info, creationContext, isolate));
         }
@@ -215,7 +216,7 @@ ScriptValue WebCLDevice::getInfo(ScriptState* scriptState, unsigned name, Except
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     default:
-        es.throwWebCLException(WebCLException::FAILURE, WebCLException::failureMessage);
+        es.throwWebCLException(WebCLException::Failure, WebCLException::failureMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 }
@@ -258,29 +259,29 @@ void WebCLDevice::getEnabledExtensions(HashSet<String>& extensions)
 int WebCLDevice::getInfo(unsigned name, String& info)
 {
     int status = getInfoCustom(name, info);
-    if (status != WebCLException::INVALID_VALUE)
+    if (status != WebCLException::InvalidValue)
         return status;
 
     size_t sizeInBytes = 0;
     status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
-    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+    if (status == WebCLException::Success && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
         char* stringBuffer = new char[sizeInBytes / sizeof(char)];
         status = clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, stringBuffer, nullptr);
-        if (status == WebCLException::SUCCESS)
+        if (status == WebCLException::Success)
             info = stringBuffer;
         delete [] stringBuffer;
         return status;
     }
 
-    return WebCLException::FAILURE;
+    return WebCLException::Failure;
 }
 
 int WebCLDevice::getInfoCustom(unsigned name, cl_device_exec_capabilities& info)
 {
     if (name != CL_DEVICE_EXECUTION_CAPABILITIES)
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     info = CL_EXEC_KERNEL;
-    return WebCLException::SUCCESS;
+    return WebCLException::Success;
 }
 
 int WebCLDevice::getInfoCustom(unsigned name, String& info)
@@ -288,15 +289,15 @@ int WebCLDevice::getInfoCustom(unsigned name, String& info)
     switch (name) {
     case CL_DEVICE_PROFILE:
         info = "WEBCL_PROFILE";
-        return WebCLException::SUCCESS;
+        return WebCLException::Success;
     case CL_DEVICE_VERSION:
         info = "WebCL 1.0";
-        return WebCLException::SUCCESS;
+        return WebCLException::Success;
     case CL_DEVICE_OPENCL_C_VERSION:
         info = "WebCL C 1.0";
-        return WebCLException::SUCCESS;
+        return WebCLException::Success;
     default:
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 }
 

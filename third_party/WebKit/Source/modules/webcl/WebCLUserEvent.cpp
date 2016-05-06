@@ -3,11 +3,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLUserEvent.h"
+
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLContext.h"
 #include "modules/webcl/WebCLCommandQueue.h"
-#include "modules/webcl/WebCLUserEvent.h"
+#include "modules/webcl/WebCLContext.h"
 
 namespace blink {
 
@@ -31,17 +32,17 @@ void WebCLUserEvent::setStatus(cl_int executionStatus, ExceptionState& es)
 {
     ASSERT(isUserEvent());
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_EVENT, WebCLException::invalidEventMessage);
+        es.throwWebCLException(WebCLException::InvalidEvent, WebCLException::invalidEventMessage);
         return;
     }
 
     if (!(executionStatus < 0 || executionStatus == CL_COMPLETE)) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return;
     }
 
     if (m_eventStatusSituation == StatusSet) {
-        es.throwWebCLException(WebCLException::INVALID_OPERATION, WebCLException::invalidOperationMessage);
+        es.throwWebCLException(WebCLException::InvalidOperation, WebCLException::invalidOperationMessage);
         return;
     }
 
@@ -59,7 +60,7 @@ ScriptValue WebCLUserEvent::getInfo(ScriptState* scriptState, unsigned name, Exc
     v8::Isolate* isolate = scriptState->isolate();
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_EVENT, WebCLException::invalidEventMessage);
+        es.throwWebCLException(WebCLException::InvalidEvent, WebCLException::invalidEventMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 

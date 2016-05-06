@@ -10,10 +10,9 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
 #include "modules/webcl/WebCLOpenCL.h"
-
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/text/WTFString.h>
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
+#include "wtf/text/WTFString.h"
 
 namespace blink {
 

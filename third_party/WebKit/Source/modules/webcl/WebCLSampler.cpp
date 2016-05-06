@@ -3,10 +3,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLSampler.h"
+
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLSampler.h"
 
 namespace blink {
 
@@ -27,7 +28,7 @@ ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info para
     v8::Isolate* isolate = scriptState->isolate();
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_SAMPLER, WebCLException::invalidSamplerMessage);
+        es.throwWebCLException(WebCLException::InvalidSampler, WebCLException::invalidSamplerMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
@@ -37,7 +38,7 @@ ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info para
         {
             cl_bool info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(info)));
         }
@@ -45,7 +46,7 @@ ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info para
         {
             cl_addressing_mode info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -53,14 +54,14 @@ ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info para
         {
             cl_filter_mode info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
     case CL_SAMPLER_CONTEXT:
         return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
     default:
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 }

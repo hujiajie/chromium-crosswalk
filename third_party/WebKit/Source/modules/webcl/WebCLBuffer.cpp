@@ -3,9 +3,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLBuffer.h"
+
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLBuffer.h"
 #include "modules/webcl/WebCLContext.h"
 #include "modules/webcl/WebCLMemoryObject.h"
 
@@ -28,7 +29,7 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::create(PassRefPtr<WebCLContext> context, un
 {
     cl_context m_clContext = context->getContext();
     if (!m_clContext) {
-        es.throwWebCLException(WebCLException::INVALID_CONTEXT, WebCLException::invalidContextMessage);
+        es.throwWebCLException(WebCLException::InvalidContext, WebCLException::invalidContextMessage);
         return nullptr;
     }
 
@@ -45,7 +46,7 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::create(PassRefPtr<WebCLContext> context, un
         clMemObject = data ? clCreateBuffer(m_clContext, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeInBytes, data, &err) : clCreateBuffer(m_clContext, CL_MEM_READ_WRITE, sizeInBytes, nullptr, &err);
         break;
     default:
-        es.throwWebCLException(WebCLException::INVALID_CONTEXT, WebCLException::invalidContextMessage);
+        es.throwWebCLException(WebCLException::InvalidContext, WebCLException::invalidContextMessage);
         break;
     }
 
@@ -62,31 +63,31 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::createSubBuffer(unsigned memoryFlags, unsig
     CLBufferRegion bufferCreateInfo = {origin, size};
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_MEM_OBJECT, WebCLException::invalidMemObjectMessage);
+        es.throwWebCLException(WebCLException::InvalidMemObject, WebCLException::invalidMemObjectMessage);
         return nullptr;
     }
 
     if (m_parentMemObject) {
-        es.throwWebCLException(WebCLException::INVALID_MEM_OBJECT, WebCLException::invalidMemObjectMessage);
+        es.throwWebCLException(WebCLException::InvalidMemObject, WebCLException::invalidMemObjectMessage);
         return nullptr;
     }
 
     cl_mem_flags memFlags;
     getInfo(CL_MEM_FLAGS, memFlags);
     if (memFlags != CL_MEM_READ_WRITE && memFlags != memoryFlags) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return nullptr;
     }
 
     size_t sizeInBytes;
     getInfo(CL_MEM_SIZE, sizeInBytes);
     if (origin > sizeInBytes || size > sizeInBytes) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return nullptr;
     }
 
     if (!WebCLInputChecker::isValidMemoryObjectFlag(memoryFlags)) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return nullptr;
     }
 
@@ -103,7 +104,7 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::createSubBuffer(unsigned memoryFlags, unsig
         clMemObject =  clCreateSubBuffer(m_clMem, CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &bufferCreateInfo, &err);
         break;
     default:
-        es.throwWebCLException(WebCLException::INVALID_CONTEXT, WebCLException::invalidContextMessage);
+        es.throwWebCLException(WebCLException::InvalidContext, WebCLException::invalidContextMessage);
         break;
     }
 

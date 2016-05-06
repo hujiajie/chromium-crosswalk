@@ -3,11 +3,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLMemoryObject.h"
+
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "bindings/modules/v8/V8WebCLMemoryObject.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLMemoryObject.h"
 
 namespace blink {
 
@@ -28,18 +29,18 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
     v8::Isolate* isolate = scriptState->isolate();
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_MEM_OBJECT, WebCLException::invalidMemObjectMessage);
+        es.throwWebCLException(WebCLException::InvalidMemObject, WebCLException::invalidMemObjectMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
     int status;
-    switch(paramName) {
+    switch (paramName) {
     case CL_MEM_SIZE:
     case CL_MEM_OFFSET:
         {
             size_t info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -47,7 +48,7 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
         {
             cl_mem_object_type info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -55,7 +56,7 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
         {
             cl_mem_flags info;
             status = getInfo(paramName, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
         }
@@ -69,7 +70,7 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
             return ScriptValue(scriptState, toV8(memoryObject, creationContext, isolate));
         }
     default:
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 }

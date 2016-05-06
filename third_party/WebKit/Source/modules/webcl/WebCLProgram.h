@@ -7,18 +7,17 @@
 #define WebCLProgram_h
 
 #include "core/webcl/WebCLException.h"
-#include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLCallback.h"
+#include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLObject.h"
 #include "modules/webcl/WebCLOpenCL.h"
-
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
-#include <wtf/Threading.h>
-#include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
+#include "wtf/RefPtr.h"
+#include "wtf/Threading.h"
+#include "wtf/Vector.h"
+#include "wtf/text/WTFString.h"
 
 namespace blink {
 
@@ -35,7 +34,7 @@ public:
     static PassRefPtr<WebCLProgram> create(cl_program, PassRefPtr<WebCLContext>, const String&);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
-    ScriptValue getBuildInfo(ScriptState* scriptState, WebCLDevice*, int, ExceptionState&);
+    ScriptValue getBuildInfo(ScriptState*, WebCLDevice*, int, ExceptionState&);
     PassRefPtr<WebCLKernel> createKernel(const String&, ExceptionState&);
     Vector<RefPtr<WebCLKernel>> createKernelsInProgram(ExceptionState&);
     void build(const Vector<RefPtr<WebCLDevice>>&, const String&, WebCLCallback*, ExceptionState&);
@@ -50,7 +49,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetProgramInfo(m_clProgram, name, sizeof(T), &info, nullptr);
@@ -64,7 +63,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getBuildInfoCustom(device, name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetProgramBuildInfo(m_clProgram, device->getDeviceId(), name, sizeof(T), &info, nullptr);
@@ -74,7 +73,7 @@ public:
 private:
     WebCLProgram(cl_program, PassRefPtr<WebCLContext>, const String&);
     bool isReleased() const { return !m_clProgram; }
-    bool isExtensionEnabled(RefPtr<blink::WebCLContext>, const String&);
+    bool isExtensionEnabled(PassRefPtr<blink::WebCLContext>, const String&);
     typedef void (CL_CALLBACK *pfnNotify)(cl_program, void*);
     static void CL_CALLBACK callbackProxy(cl_program, void*);
     static void callbackProxyOnMainThread(PassOwnPtr<WebCLProgramHolder>);
@@ -83,13 +82,13 @@ private:
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     template<typename T>
     int getBuildInfoCustom(WebCLDevice* device, unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     Persistent<WebCLCallback> m_buildCallback;

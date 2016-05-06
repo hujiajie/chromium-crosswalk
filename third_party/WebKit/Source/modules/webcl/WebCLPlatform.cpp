@@ -3,10 +3,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLPlatform.h"
+
 #include "bindings/core/v8/V8Binding.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLPlatform.h"
 
 namespace blink {
 
@@ -27,12 +28,12 @@ Vector<RefPtr<WebCLDevice>> WebCLPlatform::getDevices(ExceptionState& es)
 Vector<RefPtr<WebCLDevice>> WebCLPlatform::getDevices(unsigned deviceType, ExceptionState& es)
 {
     if (!m_clPlatformId) {
-        es.throwWebCLException(WebCLException::INVALID_PLATFORM, WebCLException::invalidPlatformMessage);
+        es.throwWebCLException(WebCLException::InvalidPlatform, WebCLException::invalidPlatformMessage);
         return Vector<RefPtr<WebCLDevice>>();
     }
 
     if (deviceType && !WebCLInputChecker::isValidDeviceType(deviceType)) {
-        es.throwWebCLException(WebCLException::INVALID_DEVICE_TYPE, WebCLException::invalidDeviceTypeMessage);
+        es.throwWebCLException(WebCLException::InvalidDeviceType, WebCLException::invalidDeviceTypeMessage);
         return Vector<RefPtr<WebCLDevice>>();
     }
 
@@ -44,7 +45,7 @@ Vector<RefPtr<WebCLDevice>> WebCLPlatform::getDevices(unsigned deviceType, Excep
 
     cl_int err = CL_SUCCESS;
     cl_uint numDevices = 0;
-    switch(deviceType) {
+    switch (deviceType) {
     case CL_DEVICE_TYPE_GPU:
         err = clGetDeviceIDs(m_clPlatformId, CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices);
         break;
@@ -83,7 +84,7 @@ Vector<RefPtr<WebCLDevice>> WebCLPlatform::getDevices(unsigned deviceType, Excep
         err = clGetDeviceIDs(m_clPlatformId, CL_DEVICE_TYPE_ACCELERATOR, numDevices, clDevices.data(), nullptr);
         break;
     case CL_DEVICE_TYPE_DEFAULT:
-        err = clGetDeviceIDs(m_clPlatformId, CL_DEVICE_TYPE_DEFAULT, numDevices, clDevices.data(), nullptr );
+        err = clGetDeviceIDs(m_clPlatformId, CL_DEVICE_TYPE_DEFAULT, numDevices, clDevices.data(), nullptr);
         break;
     case CL_DEVICE_TYPE_ALL:
         err = clGetDeviceIDs(m_clPlatformId, CL_DEVICE_TYPE_ALL, numDevices, clDevices.data(), nullptr);
@@ -114,7 +115,7 @@ ScriptValue WebCLPlatform::getInfo(ScriptState* scriptState, int platformInfo, E
     v8::Isolate* isolate = scriptState->isolate();
 
     if (!m_clPlatformId) {
-        es.throwWebCLException(WebCLException::INVALID_PLATFORM, WebCLException::invalidPlatformMessage);
+        es.throwWebCLException(WebCLException::InvalidPlatform, WebCLException::invalidPlatformMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
@@ -128,12 +129,12 @@ ScriptValue WebCLPlatform::getInfo(ScriptState* scriptState, int platformInfo, E
         {
             String info;
             status = getInfo(platformInfo, info);
-            if (status != WebCLException::SUCCESS)
+            if (status != WebCLException::Success)
                 WebCLException::throwException(status, es);
             return ScriptValue(scriptState, v8String(isolate, info));
         }
     default:
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 }
@@ -176,21 +177,21 @@ void WebCLPlatform::getEnabledExtensions(HashSet<String>& extensions)
 int WebCLPlatform::getInfo(unsigned name, String& info)
 {
     int status = getInfoCustom(name, info);
-    if (status != WebCLException::INVALID_VALUE)
+    if (status != WebCLException::InvalidValue)
         return status;
 
     size_t sizeInBytes = 0;
     status = clGetPlatformInfo(m_clPlatformId, name, 0, nullptr, &sizeInBytes);
-    if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
+    if (status == WebCLException::Success && sizeInBytes >= sizeof(char) && sizeInBytes % sizeof(char) == 0) {
         char* stringBuffer = new char[sizeInBytes / sizeof(char)];
         status = clGetPlatformInfo(m_clPlatformId, name, sizeInBytes, stringBuffer, nullptr);
-        if (status == WebCLException::SUCCESS)
+        if (status == WebCLException::Success)
             info = stringBuffer;
         delete [] stringBuffer;
         return status;
     }
 
-    return WebCLException::FAILURE;
+    return WebCLException::Failure;
 }
 
 int WebCLPlatform::getInfoCustom(unsigned name, String& info)
@@ -198,12 +199,12 @@ int WebCLPlatform::getInfoCustom(unsigned name, String& info)
     switch (name) {
     case CL_PLATFORM_PROFILE:
         info = "WEBCL_PROFILE";
-        return WebCLException::SUCCESS;
+        return WebCLException::Success;
     case CL_PLATFORM_VERSION:
         info = "WebCL 1.0";
-        return WebCLException::SUCCESS;
+        return WebCLException::Success;
     default:
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 }
 

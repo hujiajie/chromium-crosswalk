@@ -10,6 +10,7 @@
 
 namespace blink {
 
+class DOMWindow;
 class LocalDOMWindow;
 class WebCL;
 

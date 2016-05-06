@@ -10,12 +10,10 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
 #include "modules/webcl/WebCLOpenCL.h"
-
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/PassRefPtr.h>
-#include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
+#include "wtf/Vector.h"
+#include "wtf/text/WTFString.h"
 
 namespace blink {
 
@@ -29,7 +27,7 @@ class WebCLDevice final : public RefCounted<WebCLDevice>, public ScriptWrappable
 public:
     ~WebCLDevice();
     static PassRefPtr<WebCLDevice> create(cl_device_id);
-    static PassRefPtr<WebCLDevice> create(cl_device_id, WebCLPlatform* platform);
+    static PassRefPtr<WebCLDevice> create(cl_device_id, WebCLPlatform*);
 
     ScriptValue getInfo(ScriptState*, unsigned, ExceptionState&);
 
@@ -43,7 +41,7 @@ public:
     int getInfo(unsigned name, T& info)
     {
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetDeviceInfo(m_clDeviceId, name, sizeof(T), &info, nullptr);
@@ -52,28 +50,28 @@ public:
     int getInfo(unsigned name, Vector<T>& info)
     {
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         size_t sizeInBytes = 0;
         status = clGetDeviceInfo(m_clDeviceId, name, 0, nullptr, &sizeInBytes);
-        if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
+        if (status == WebCLException::Success && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
             info.resize(sizeInBytes / sizeof(T));
             return clGetDeviceInfo(m_clDeviceId, name, sizeInBytes, info.data(), nullptr);
         }
 
-        return WebCLException::FAILURE;
+        return WebCLException::Failure;
     }
     int getInfo(unsigned name, String&);
     PassRefPtr<WebCLPlatform> platform();
 
 private:
-    WebCLDevice(cl_device_id, WebCLPlatform* platform);
+    WebCLDevice(cl_device_id, WebCLPlatform*);
 
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
     int getInfoCustom(unsigned name, cl_device_exec_capabilities&);
     int getInfoCustom(unsigned name, String&);

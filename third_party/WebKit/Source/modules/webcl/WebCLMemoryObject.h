@@ -10,9 +10,8 @@
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
 #include "modules/webcl/WebCLOpenCL.h"
-
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
 
 namespace blink {
 
@@ -38,7 +37,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetMemObjectInfo(m_clMem, name, sizeof(T), &info, nullptr);
@@ -51,7 +50,7 @@ protected:
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     WebCLMemoryObject* m_parentMemObject;

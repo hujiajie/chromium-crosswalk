@@ -10,13 +10,12 @@
 #include "modules/webcl/WebCLKernelArgInfoProvider.h"
 #include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLProgram.h"
-
-#include <wtf/OwnPtr.h>
-#include <wtf/PassRefPtr.h>
-#include <wtf/RefCounted.h>
-#include <wtf/RefPtr.h>
-#include <wtf/Vector.h>
-#include <wtf/text/WTFString.h>
+#include "wtf/OwnPtr.h"
+#include "wtf/PassRefPtr.h"
+#include "wtf/RefCounted.h"
+#include "wtf/RefPtr.h"
+#include "wtf/Vector.h"
+#include "wtf/text/WTFString.h"
 
 namespace blink {
 
@@ -56,7 +55,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getInfoCustom(name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         return clGetKernelInfo(m_clKernel, name, sizeof(T), &info, nullptr);
@@ -70,7 +69,7 @@ public:
         ASSERT(!isReleased());
 
         int status = getWorkGroupInfoCustom(device, name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         cl_device_id clDeviceId = device ? device->getDeviceId() : 0;
@@ -82,18 +81,18 @@ public:
         ASSERT(!isReleased());
 
         int status = getWorkGroupInfoCustom(device, name, info);
-        if (status != WebCLException::INVALID_VALUE)
+        if (status != WebCLException::InvalidValue)
             return status;
 
         cl_device_id clDeviceId = device ? device->getDeviceId() : 0;
         size_t sizeInBytes = 0;
         status = clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, 0, nullptr, &sizeInBytes);
-        if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
+        if (status == WebCLException::Success && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
             info.resize(sizeInBytes / sizeof(T));
             return clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, sizeInBytes, info.data(), nullptr);
         }
 
-        return WebCLException::FAILURE;
+        return WebCLException::Failure;
     }
 
 private:
@@ -103,13 +102,13 @@ private:
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     template<typename T>
     int getWorkGroupInfoCustom(WebCLDevice* device, unsigned name, T& info)
     {
-        return WebCLException::INVALID_VALUE;
+        return WebCLException::InvalidValue;
     }
 
     RefPtr<WebCLProgram> m_program;

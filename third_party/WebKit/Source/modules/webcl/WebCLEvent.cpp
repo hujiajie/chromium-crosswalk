@@ -3,11 +3,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "modules/webcl/WebCLEvent.h"
+
 #include "bindings/modules/v8/V8WebCLCommandQueue.h"
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLEvent.h"
 #include "platform/ThreadSafeFunctional.h"
 #include "public/platform/Platform.h"
 #include "public/platform/WebTaskRunner.h"
@@ -41,14 +42,14 @@ ScriptValue WebCLEvent::getInfo(ScriptState* scriptState, unsigned paramName, Ex
     v8::Isolate* isolate = scriptState->isolate();
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_EVENT, WebCLException::invalidEventMessage);
+        es.throwWebCLException(WebCLException::InvalidEvent, WebCLException::invalidEventMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
     cl_int err = CL_SUCCESS;
     cl_int intUnits = 0;
     cl_command_type commandType = 0;
-    switch(paramName) {
+    switch (paramName) {
     case CL_EVENT_COMMAND_EXECUTION_STATUS:
         err = clGetEventInfo(m_clEvent, CL_EVENT_COMMAND_EXECUTION_STATUS, sizeof(cl_int), &intUnits, nullptr);
         if (err == CL_SUCCESS)
@@ -67,7 +68,7 @@ ScriptValue WebCLEvent::getInfo(ScriptState* scriptState, unsigned paramName, Ex
         ASSERT(!isUserEvent());
         return ScriptValue(scriptState, toV8(m_commandQueue, creationContext, isolate));
     default:
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
     WebCLException::throwException(err, es);
@@ -88,25 +89,25 @@ ScriptValue WebCLEvent::getProfilingInfo(ScriptState* scriptState, unsigned para
     v8::Isolate* isolate = scriptState->isolate();
 
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_EVENT, WebCLException::invalidEventMessage);
+        es.throwWebCLException(WebCLException::InvalidEvent, WebCLException::invalidEventMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
     int status = getStatus();
     cl_command_queue_properties properties = 0;
     if (m_commandQueue) {
-        if (m_commandQueue->getInfo(CL_QUEUE_PROPERTIES, properties) != WebCLException::SUCCESS) {
+        if (m_commandQueue->getInfo(CL_QUEUE_PROPERTIES, properties) != WebCLException::Success) {
             properties = 0;
         }
     }
     if (isUserEvent() || status != CL_COMPLETE || !(properties & CL_QUEUE_PROFILING_ENABLE)) {
-        es.throwWebCLException(WebCLException::PROFILING_INFO_NOT_AVAILABLE, WebCLException::profilingInfoNotAvailableMessage);
+        es.throwWebCLException(WebCLException::ProfilingInfoNotAvailable, WebCLException::profilingInfoNotAvailableMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
     cl_int err = CL_SUCCESS;
     cl_ulong ulongUnits = 0;
-    switch(paramName) {
+    switch (paramName) {
     case CL_PROFILING_COMMAND_QUEUED:
         err = clGetEventProfilingInfo(m_clEvent, CL_PROFILING_COMMAND_QUEUED, sizeof(cl_ulong), &ulongUnits, nullptr);
         if (err == CL_SUCCESS)
@@ -128,7 +129,7 @@ ScriptValue WebCLEvent::getProfilingInfo(ScriptState* scriptState, unsigned para
             return ScriptValue(scriptState, v8::Number::New(isolate, static_cast<double>(ulongUnits)));
         break;
     default:
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
@@ -139,12 +140,12 @@ ScriptValue WebCLEvent::getProfilingInfo(ScriptState* scriptState, unsigned para
 void WebCLEvent::setCallback(unsigned commandExecCallbackType, WebCLCallback* callback, ExceptionState& es)
 {
     if (isReleased()) {
-        es.throwWebCLException(WebCLException::INVALID_EVENT, WebCLException::invalidEventMessage);
+        es.throwWebCLException(WebCLException::InvalidEvent, WebCLException::invalidEventMessage);
         return;
     }
 
     if (commandExecCallbackType != CL_COMPLETE) {
-        es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
+        es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);
         return;
     }
 
