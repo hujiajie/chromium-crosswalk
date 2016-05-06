@@ -8,6 +8,7 @@
 
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLEvent.h"
+#include "modules/webcl/WebCLOpenCL.h"
 #include "wtf/PassRefPtr.h"
 
 namespace blink {

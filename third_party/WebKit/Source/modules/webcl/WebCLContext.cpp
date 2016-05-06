@@ -25,7 +25,6 @@
 #include "modules/webcl/WebCLMemoryObject.h"
 #include "modules/webcl/WebCLMemoryUtil.h"
 #include "modules/webcl/WebCLObject.h"
-#include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLSampler.h"
 #include "modules/webcl/WebCLUserEvent.h"
 

@@ -10,6 +10,7 @@
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLDevice.h"
+#include "modules/webcl/WebCLOpenCL.h"
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
 #include <wtf/PassRefPtr.h>

@@ -7,7 +7,6 @@
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLKernel.h"
-#include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLProgram.h"
 #include "platform/ThreadSafeFunctional.h"
 #include "public/platform/Platform.h"

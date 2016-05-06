@@ -17,7 +17,6 @@
 #include "modules/webcl/WebCLImage.h"
 #include "modules/webcl/WebCLKernel.h"
 #include "modules/webcl/WebCLKernelArgInfo.h"
-#include "modules/webcl/WebCLOpenCL.h"
 
 namespace blink {
 

@@ -8,6 +8,7 @@
 
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCLKernelArgInfoProvider.h"
+#include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLProgram.h"
 
 #include <wtf/OwnPtr.h>

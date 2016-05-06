@@ -8,6 +8,7 @@
 
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLMemoryObject.h"
+#include "modules/webcl/WebCLOpenCL.h"
 
 namespace blink {
 

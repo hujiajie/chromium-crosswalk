@@ -6,7 +6,6 @@
 #include "bindings/modules/v8/V8WebCLContext.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLSampler.h"
 
 namespace blink {

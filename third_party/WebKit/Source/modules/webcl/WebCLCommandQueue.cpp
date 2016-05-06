@@ -21,7 +21,6 @@
 #include "modules/webcl/WebCLImageDescriptor.h"
 #include "modules/webcl/WebCLInputChecker.h"
 #include "modules/webcl/WebCLKernel.h"
-#include "modules/webcl/WebCLOpenCL.h"
 #include "public/platform/Platform.h"
 #include "public/platform/WebTaskRunner.h"
 #include "platform/ThreadSafeFunctional.h"

@@ -7,7 +7,6 @@
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLContext.h"
 #include "modules/webcl/WebCLCommandQueue.h"
-#include "modules/webcl/WebCLOpenCL.h"
 #include "modules/webcl/WebCLUserEvent.h"
 
 namespace blink {
