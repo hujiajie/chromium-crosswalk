@@ -199,7 +199,9 @@ void WebCLKernel::setArg(unsigned index, WebCLMemoryObject* object, ExceptionSta
     }
 
     WebCLKernelArgInfo* argInfo = getArgInfo(index, es);
-    if (!argInfo || (object->type() == WebCLMemoryObject::IMAGE && argInfo->type() != WebCLKernelArgInfo::IMAGE) || (object->type() == WebCLMemoryObject::BUFFER && (argInfo->addressQualifier().isEmpty() || argInfo->type() != WebCLKernelArgInfo::BUFFER))) {
+    cl_mem_object_type type;
+    object->getInfo(CL_MEM_TYPE, type);
+    if (!argInfo || (type == CL_MEM_OBJECT_IMAGE2D && argInfo->type() != WebCLKernelArgInfo::IMAGE) || (type == CL_MEM_OBJECT_BUFFER && (argInfo->addressQualifier().isEmpty() || argInfo->type() != WebCLKernelArgInfo::BUFFER))) {
         es.throwWebCLException(WebCLException::INVALID_ARG_VALUE, WebCLException::invalidArgIndexMessage);
         return;
     }

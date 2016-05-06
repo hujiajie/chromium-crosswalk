@@ -22,20 +22,12 @@ class WebCLContext;
 class WebCLMemoryObject : public WebCLObject, public ScriptWrappable {
     DEFINE_WRAPPERTYPEINFO();
 public:
-    enum {
-        MEMORY,
-        BUFFER,
-        IMAGE,
-        UNKNOWN
-    };
-
     ~WebCLMemoryObject() override;
     static PassRefPtr<WebCLMemoryObject> create(cl_mem, PassRefPtr<WebCLContext>);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
     void release() override;
 
-    virtual int type() { return MEMORY; }
     cl_mem getMem() const { return m_clMem; }
     bool isReleased() const { return !m_clMem; }
 

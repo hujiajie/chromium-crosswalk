@@ -26,7 +26,6 @@ public:
 
     void getInfo(ExceptionState&, WebCLImageDescriptor&);
     const WebCLImageDescriptor& imageDescriptor() { return m_imageDescriptor; }
-    int type() override { return IMAGE; }
 
 private:
     WebCLImage(cl_mem, const WebCLImageDescriptor&, PassRefPtr<WebCLContext>);
