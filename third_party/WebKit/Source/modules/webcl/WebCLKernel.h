@@ -72,7 +72,8 @@ public:
         if (status != WebCLException::INVALID_VALUE)
             return status;
 
-        return clGetKernelWorkGroupInfo(m_clKernel, device->getDeviceId(), name, sizeof(T), &info, nullptr);
+        cl_device_id clDeviceId = device ? device->getDeviceId() : 0;
+        return clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, sizeof(T), &info, nullptr);
     }
     template<typename T>
     int getWorkGroupInfo(WebCLDevice* device, unsigned name, Vector<T>& info)
@@ -83,7 +84,7 @@ public:
         if (status != WebCLException::INVALID_VALUE)
             return status;
 
-        cl_device_id clDeviceId = device->getDeviceId();
+        cl_device_id clDeviceId = device ? device->getDeviceId() : 0;
         size_t sizeInBytes = 0;
         status = clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, 0, nullptr, &sizeInBytes);
         if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
