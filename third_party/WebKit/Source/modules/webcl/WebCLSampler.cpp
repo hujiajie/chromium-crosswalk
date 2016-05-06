@@ -17,9 +17,9 @@ WebCLSampler::~WebCLSampler()
     ASSERT(!m_clSampler);
 }
 
-PassRefPtr<WebCLSampler> WebCLSampler::create(cl_sampler sampler, bool normCoords, unsigned addressingMode, unsigned filterMode, PassRefPtr<WebCLContext> context)
+PassRefPtr<WebCLSampler> WebCLSampler::create(cl_sampler sampler, PassRefPtr<WebCLContext> context)
 {
-    return adoptRef(new WebCLSampler(sampler, normCoords, addressingMode, filterMode, context));
+    return adoptRef(new WebCLSampler(sampler, context));
 }
 
 ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info paramName, ExceptionState& es)
@@ -32,25 +32,38 @@ ScriptValue WebCLSampler::getInfo(ScriptState* scriptState, cl_sampler_info para
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
+    int status;
     switch (paramName) {
     case CL_SAMPLER_NORMALIZED_COORDS:
-        return ScriptValue(scriptState,  v8::Boolean::New(isolate, m_normCoords));
-        break;
+        {
+            cl_bool info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Boolean::New(isolate, static_cast<bool>(info)));
+        }
+    case CL_SAMPLER_ADDRESSING_MODE:
+        {
+            cl_addressing_mode info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_SAMPLER_FILTER_MODE:
+        {
+            cl_filter_mode info;
+            status = getInfo(paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
     case CL_SAMPLER_CONTEXT:
         return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
-        break;
-    case CL_SAMPLER_ADDRESSING_MODE:
-        return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(m_addressingMode)));
-        break;
-    case CL_SAMPLER_FILTER_MODE:
-        return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(m_filterMode)));
-        break;
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 void WebCLSampler::release()
@@ -65,11 +78,8 @@ void WebCLSampler::release()
     m_clSampler = 0;
 }
 
-WebCLSampler::WebCLSampler(cl_sampler sampler, bool normCoords, unsigned addressingMode, unsigned filterMode, PassRefPtr<WebCLContext> context)
+WebCLSampler::WebCLSampler(cl_sampler sampler, PassRefPtr<WebCLContext> context)
     : WebCLObject(context)
-    , m_normCoords(normCoords)
-    , m_addressingMode(addressingMode)
-    , m_filterMode(filterMode)
     , m_clSampler(sampler)
 {
 }

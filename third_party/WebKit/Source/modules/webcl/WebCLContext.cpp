@@ -243,7 +243,7 @@ PassRefPtr<WebCLSampler> WebCLContext::createSampler(bool normCords, unsigned ad
         return nullptr;
     }
 
-    RefPtr<WebCLSampler> sampler = WebCLSampler::create(clSamplerId, normCords, addrMode, fltrMode, this);
+    RefPtr<WebCLSampler> sampler = WebCLSampler::create(clSamplerId, this);
     if (!sampler) {
         es.throwWebCLException(WebCLException::FAILURE, WebCLException::failureMessage);
         return nullptr;
