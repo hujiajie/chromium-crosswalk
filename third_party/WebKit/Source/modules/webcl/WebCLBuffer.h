@@ -22,9 +22,7 @@ public:
     PassRefPtr<WebCLBuffer> createSubBuffer(unsigned, unsigned, unsigned, ExceptionState&);
 
 private:
-    WebCLBuffer(cl_mem, PassRefPtr<WebCLContext>, unsigned, WebCLBuffer* parentBuffer = nullptr);
-
-    unsigned m_memoryFlags;
+    WebCLBuffer(cl_mem, PassRefPtr<WebCLContext>, WebCLBuffer* parentBuffer = nullptr);
 };
 
 } // namespace blink
