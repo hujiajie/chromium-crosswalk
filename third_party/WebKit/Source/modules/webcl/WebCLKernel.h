@@ -14,6 +14,7 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
+#include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 
 namespace blink {
@@ -62,12 +63,49 @@ public:
     int getInfo(unsigned name, String& info);
     PassRefPtr<WebCLProgram> program();
 
+    template<typename T>
+    int getWorkGroupInfo(WebCLDevice* device, unsigned name, T& info)
+    {
+        ASSERT(!isReleased());
+
+        int status = getWorkGroupInfoCustom(device, name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        return clGetKernelWorkGroupInfo(m_clKernel, device->getDeviceId(), name, sizeof(T), &info, nullptr);
+    }
+    template<typename T>
+    int getWorkGroupInfo(WebCLDevice* device, unsigned name, Vector<T>& info)
+    {
+        ASSERT(!isReleased());
+
+        int status = getWorkGroupInfoCustom(device, name, info);
+        if (status != WebCLException::INVALID_VALUE)
+            return status;
+
+        cl_device_id clDeviceId = device->getDeviceId();
+        size_t sizeInBytes = 0;
+        status = clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, 0, nullptr, &sizeInBytes);
+        if (status == WebCLException::SUCCESS && sizeInBytes >= sizeof(T) && sizeInBytes % sizeof(T) == 0) {
+            info.resize(sizeInBytes / sizeof(T));
+            return clGetKernelWorkGroupInfo(m_clKernel, clDeviceId, name, sizeInBytes, info.data(), nullptr);
+        }
+
+        return WebCLException::FAILURE;
+    }
+
 private:
     WebCLKernel(cl_kernel, PassRefPtr<WebCLContext>, PassRefPtr<WebCLProgram>);
     bool isReleased() const { return !m_clKernel; }
 
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
+    {
+        return WebCLException::INVALID_VALUE;
+    }
+
+    template<typename T>
+    int getWorkGroupInfoCustom(WebCLDevice* device, unsigned name, T& info)
     {
         return WebCLException::INVALID_VALUE;
     }

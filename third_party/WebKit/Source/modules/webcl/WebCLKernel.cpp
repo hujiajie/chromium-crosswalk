@@ -80,18 +80,11 @@ ScriptValue WebCLKernel::getWorkGroupInfo(ScriptState* scriptState, WebCLDevice*
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_device_id clDevice = nullptr;
     Vector<RefPtr<WebCLDevice>> deviceList = context()->devices();
     if (device) {
-        clDevice = device->getDeviceId();
-        if (!clDevice) {
-            es.throwWebCLException(WebCLException::INVALID_DEVICE, WebCLException::invalidDeviceMessage);
-            return ScriptValue(scriptState, v8::Null(isolate));
-        }
-
         size_t i;
         for (i = 0; i < deviceList.size(); i ++) {
-            if (clDevice == deviceList[i]->getDeviceId())
+            if (device == deviceList[i])
                 break;
         }
 
@@ -106,47 +99,38 @@ ScriptValue WebCLKernel::getWorkGroupInfo(ScriptState* scriptState, WebCLDevice*
         return ScriptValue(scriptState, v8::Null(isolate));
     }
 
-    cl_int err = CL_SUCCESS;
-    size_t sizetUnits = 0;
-    size_t workGroupSize[3] = {0};
-    cl_ulong ulongUnits = 0;
+    int status;
     switch (paramName) {
-    case CL_KERNEL_WORK_GROUP_SIZE:
-        err = clGetKernelWorkGroupInfo(m_clKernel, clDevice, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_KERNEL_PRIVATE_MEM_SIZE:
-        err = clGetKernelWorkGroupInfo(m_clKernel, clDevice, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
-    case CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE:
-        err = clGetKernelWorkGroupInfo(m_clKernel, clDevice, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &sizetUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(sizetUnits)));
-        break;
-    case CL_KERNEL_COMPILE_WORK_GROUP_SIZE:
-        err = clGetKernelWorkGroupInfo(m_clKernel, clDevice, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(workGroupSize), &workGroupSize, nullptr);
-        if (err == CL_SUCCESS) {
-            Vector<unsigned> values;
-            for (unsigned i = 0; i < 3; ++i)
-                values.append((unsigned)workGroupSize[i]);
-            return ScriptValue(scriptState, toV8(values, creationContext, isolate));
-        }
-        break;
     case CL_KERNEL_LOCAL_MEM_SIZE:
-        err = clGetKernelWorkGroupInfo(m_clKernel, clDevice, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &ulongUnits, nullptr);
-        if (err == CL_SUCCESS)
-            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned long long>(ulongUnits)));
-        break;
+    case CL_KERNEL_PRIVATE_MEM_SIZE:
+        {
+            cl_ulong info;
+            status = getWorkGroupInfo(device, paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_KERNEL_WORK_GROUP_SIZE:
+    case CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE:
+        {
+            size_t info;
+            status = getWorkGroupInfo(device, paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, v8::Integer::NewFromUnsigned(isolate, static_cast<unsigned>(info)));
+        }
+    case CL_KERNEL_COMPILE_WORK_GROUP_SIZE:
+        {
+            Vector<size_t> info;
+            status = getWorkGroupInfo(device, paramName, info);
+            if (status != WebCLException::SUCCESS)
+                WebCLException::throwException(status, es);
+            return ScriptValue(scriptState, toV8(info, creationContext, isolate));
+        }
     default:
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return ScriptValue(scriptState, v8::Null(isolate));
     }
-
-    WebCLException::throwException(err, es);
-    return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 #if CPU(BIG_ENDIAN)
