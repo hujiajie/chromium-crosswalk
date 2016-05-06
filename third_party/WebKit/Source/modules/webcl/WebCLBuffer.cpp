@@ -54,7 +54,7 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::create(PassRefPtr<WebCLContext> context, un
         WebCLException::throwException(err, es);
         return nullptr;
     }
-    RefPtr<WebCLBuffer> buffer = adoptRef(new WebCLBuffer(clMemObject, context, memoryFlags, sizeInBytes));
+    RefPtr<WebCLBuffer> buffer = adoptRef(new WebCLBuffer(clMemObject, context, memoryFlags));
     return buffer.release();
 }
 
@@ -77,7 +77,9 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::createSubBuffer(unsigned memoryFlags, unsig
         return nullptr;
     }
 
-    if (origin > sizeInBytes() || size > sizeInBytes()) {
+    size_t sizeInBytes;
+    getInfo(CL_MEM_SIZE, sizeInBytes);
+    if (origin > sizeInBytes || size > sizeInBytes) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return nullptr;
     }
@@ -109,12 +111,12 @@ PassRefPtr<WebCLBuffer> WebCLBuffer::createSubBuffer(unsigned memoryFlags, unsig
         return nullptr;
     }
 
-    RefPtr<WebCLBuffer> buffer = adoptRef(new WebCLBuffer(clMemObject, context(), memoryFlags, size, this));
+    RefPtr<WebCLBuffer> buffer = adoptRef(new WebCLBuffer(clMemObject, context(), memoryFlags, this));
     return buffer.release();
 }
 
-WebCLBuffer::WebCLBuffer(cl_mem clMem, PassRefPtr<WebCLContext> context, unsigned memoryFlags, unsigned size, WebCLBuffer* parentBuffer)
-    : WebCLMemoryObject(clMem, size, context, parentBuffer)
+WebCLBuffer::WebCLBuffer(cl_mem clMem, PassRefPtr<WebCLContext> context, unsigned memoryFlags, WebCLBuffer* parentBuffer)
+    : WebCLMemoryObject(clMem, context, parentBuffer)
     , m_memoryFlags(memoryFlags)
 {
 }

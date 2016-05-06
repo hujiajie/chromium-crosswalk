@@ -216,7 +216,9 @@ void WebCLCommandQueue::enqueueWriteBufferBase(WebCLBuffer* mem, bool blockingWr
         return;
     }
 
-    if (ptrLength < bufferSize || mem->sizeInBytes() < (offset + bufferSize)) {
+    size_t memSizeInBytes;
+    mem->getInfo(CL_MEM_SIZE, memSizeInBytes);
+    if (ptrLength < bufferSize || memSizeInBytes < (offset + bufferSize)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -327,7 +329,9 @@ void WebCLCommandQueue::enqueueWriteBufferRectBase(WebCLBuffer* mem, bool blocki
     hostOriginCopy.appendVector(hostOrigin);
     regionCopy.appendVector(region);
 
-    if (!WebCLInputChecker::isValidRegionForMemoryObject(bufferOriginCopy, regionCopy, bufferRowPitch, bufferSlicePitch, mem->sizeInBytes()) || !WebCLInputChecker::isValidRegionForMemoryObject(hostOriginCopy, regionCopy, hostRowPitch, hostSlicePitch, ptrLength)) {
+    size_t memSizeInBytes;
+    mem->getInfo(CL_MEM_SIZE, memSizeInBytes);
+    if (!WebCLInputChecker::isValidRegionForMemoryObject(bufferOriginCopy, regionCopy, bufferRowPitch, bufferSlicePitch, memSizeInBytes) || !WebCLInputChecker::isValidRegionForMemoryObject(hostOriginCopy, regionCopy, hostRowPitch, hostSlicePitch, ptrLength)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -424,7 +428,9 @@ void WebCLCommandQueue::enqueueReadBufferBase(WebCLBuffer* mem, bool blockingRea
         }
     }
 
-    if (ptrLength < bufferSize || mem->sizeInBytes() < (offset + bufferSize)) {
+    size_t memSizeInBytes;
+    mem->getInfo(CL_MEM_SIZE, memSizeInBytes);
+    if (ptrLength < bufferSize || memSizeInBytes < (offset + bufferSize)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -505,7 +511,9 @@ void WebCLCommandQueue::enqueueReadBufferRectBase(WebCLBuffer* mem, bool blockin
     hostOriginCopy.appendVector(hostOrigin);
     regionCopy.appendVector(region);
 
-    if (!WebCLInputChecker::isValidRegionForMemoryObject(hostOriginCopy, regionCopy, hostRowPitch, hostSlicePitch, ptrLength) || !WebCLInputChecker::isValidRegionForMemoryObject(bufferOriginCopy, regionCopy, bufferRowPitch, bufferSlicePitch, mem->sizeInBytes())) {
+    size_t memSizeInBytes;
+    mem->getInfo(CL_MEM_SIZE, memSizeInBytes);
+    if (!WebCLInputChecker::isValidRegionForMemoryObject(hostOriginCopy, regionCopy, hostRowPitch, hostSlicePitch, ptrLength) || !WebCLInputChecker::isValidRegionForMemoryObject(bufferOriginCopy, regionCopy, bufferRowPitch, bufferSlicePitch, memSizeInBytes)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -920,8 +928,11 @@ void WebCLCommandQueue::enqueueCopyBuffer(WebCLBuffer* srcBuffer, WebCLBuffer* d
         return;
     }
 
-    if ((srcOffset + cb) > srcBuffer->sizeInBytes()
-        || (dstOffset + cb) > dstBuffer->sizeInBytes()) {
+    size_t srcBufferSizeInBytes, dstBufferSizeInBytes;
+    srcBuffer->getInfo(CL_MEM_SIZE, srcBufferSizeInBytes);
+    dstBuffer->getInfo(CL_MEM_SIZE, dstBufferSizeInBytes);
+    if ((srcOffset + cb) > srcBufferSizeInBytes
+        || (dstOffset + cb) > dstBufferSizeInBytes) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -988,7 +999,10 @@ void WebCLCommandQueue::enqueueCopyBufferRect(WebCLBuffer* srcBuffer, WebCLBuffe
     dstOriginCopy.appendVector(dstOrigin);
     regionCopy.appendVector(region);
 
-    if (!WebCLInputChecker::isValidRegionForMemoryObject(srcOriginCopy, regionCopy, srcRowPitch, srcSlicePitch, srcBuffer->sizeInBytes()) || !WebCLInputChecker::isValidRegionForMemoryObject(dstOriginCopy, regionCopy, dstRowPitch, dstSlicePitch, dstBuffer->sizeInBytes())) {
+    size_t srcBufferSizeInBytes, dstBufferSizeInBytes;
+    srcBuffer->getInfo(CL_MEM_SIZE, srcBufferSizeInBytes);
+    dstBuffer->getInfo(CL_MEM_SIZE, dstBufferSizeInBytes);
+    if (!WebCLInputChecker::isValidRegionForMemoryObject(srcOriginCopy, regionCopy, srcRowPitch, srcSlicePitch, srcBufferSizeInBytes) || !WebCLInputChecker::isValidRegionForMemoryObject(dstOriginCopy, regionCopy, dstRowPitch, dstSlicePitch, dstBufferSizeInBytes)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -1111,7 +1125,9 @@ void WebCLCommandQueue::enqueueCopyImageToBuffer(WebCLImage* srcImage, WebCLBuff
         return;
     }
 
-    if (!WebCLInputChecker::isValidRegionForBuffer(dstBuffer->sizeInBytes(), region, offset, srcImage->imageDescriptor()) || !WebCLInputChecker::isValidRegionForImage(srcImage->imageDescriptor(), srcOrigin, region)) {
+    size_t dstBufferSizeInBytes;
+    dstBuffer->getInfo(CL_MEM_SIZE, dstBufferSizeInBytes);
+    if (!WebCLInputChecker::isValidRegionForBuffer(dstBufferSizeInBytes, region, offset, srcImage->imageDescriptor()) || !WebCLInputChecker::isValidRegionForImage(srcImage->imageDescriptor(), srcOrigin, region)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }
@@ -1171,7 +1187,9 @@ void WebCLCommandQueue::enqueueCopyBufferToImage(WebCLBuffer* srcBuffer, WebCLIm
         return;
     }
 
-    if (!WebCLInputChecker::isValidRegionForBuffer(srcBuffer->sizeInBytes(), region, offset, dstImage->imageDescriptor()) || !WebCLInputChecker::isValidRegionForImage(dstImage->imageDescriptor(), dstOrigin, region)) {
+    size_t srcBufferSizeInBytes;
+    srcBuffer->getInfo(CL_MEM_SIZE, srcBufferSizeInBytes);
+    if (!WebCLInputChecker::isValidRegionForBuffer(srcBufferSizeInBytes, region, offset, dstImage->imageDescriptor()) || !WebCLInputChecker::isValidRegionForImage(dstImage->imageDescriptor(), dstOrigin, region)) {
         es.throwWebCLException(WebCLException::INVALID_VALUE, WebCLException::invalidValueMessage);
         return;
     }

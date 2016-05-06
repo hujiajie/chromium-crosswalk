@@ -18,9 +18,9 @@ WebCLMemoryObject::~WebCLMemoryObject()
     ASSERT(!m_clMem);
 }
 
-PassRefPtr<WebCLMemoryObject> WebCLMemoryObject::create(cl_mem mem, unsigned sizeInBytes, PassRefPtr<WebCLContext> context)
+PassRefPtr<WebCLMemoryObject> WebCLMemoryObject::create(cl_mem mem, PassRefPtr<WebCLContext> context)
 {
-    return adoptRef(new WebCLMemoryObject(mem, sizeInBytes, context));
+    return adoptRef(new WebCLMemoryObject(mem, context));
 }
 
 ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, ExceptionState& es)
@@ -94,10 +94,9 @@ PassRefPtr<WebCLMemoryObject> WebCLMemoryObject::associatedMemObject()
     return m_parentMemObject;
 }
 
-WebCLMemoryObject::WebCLMemoryObject(cl_mem mem, unsigned sizeInBytes, PassRefPtr<WebCLContext> context, WebCLMemoryObject* parentBuffer)
+WebCLMemoryObject::WebCLMemoryObject(cl_mem mem, PassRefPtr<WebCLContext> context, WebCLMemoryObject* parentBuffer)
     : WebCLObject(context)
     , m_parentMemObject(parentBuffer)
-    , m_sizeInBytes(sizeInBytes)
     , m_clMem(mem)
 {
 }

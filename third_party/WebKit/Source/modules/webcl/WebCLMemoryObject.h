@@ -30,12 +30,11 @@ public:
     };
 
     ~WebCLMemoryObject() override;
-    static PassRefPtr<WebCLMemoryObject> create(cl_mem, unsigned, PassRefPtr<WebCLContext>);
+    static PassRefPtr<WebCLMemoryObject> create(cl_mem, PassRefPtr<WebCLContext>);
 
     ScriptValue getInfo(ScriptState*, int, ExceptionState&);
     void release() override;
 
-    size_t sizeInBytes() const { return m_sizeInBytes; }
     virtual int type() { return MEMORY; }
     cl_mem getMem() const { return m_clMem; }
     bool isReleased() const { return !m_clMem; }
@@ -54,7 +53,7 @@ public:
     PassRefPtr<WebCLMemoryObject> associatedMemObject();
 
 protected:
-    WebCLMemoryObject(cl_mem, unsigned, PassRefPtr<WebCLContext>, WebCLMemoryObject* parentBuffer = nullptr);
+    WebCLMemoryObject(cl_mem, PassRefPtr<WebCLContext>, WebCLMemoryObject* parentBuffer = nullptr);
 
     template<typename T>
     int getInfoCustom(unsigned name, T& info)
@@ -63,7 +62,6 @@ protected:
     }
 
     WebCLMemoryObject* m_parentMemObject;
-    size_t m_sizeInBytes;
     cl_mem m_clMem;
 };
 

@@ -24,7 +24,7 @@ public:
     int type() override { return BUFFER; }
 
 private:
-    WebCLBuffer(cl_mem, PassRefPtr<WebCLContext>, unsigned, unsigned, WebCLBuffer* parentBuffer = nullptr);
+    WebCLBuffer(cl_mem, PassRefPtr<WebCLContext>, unsigned, WebCLBuffer* parentBuffer = nullptr);
 
     unsigned m_memoryFlags;
 };

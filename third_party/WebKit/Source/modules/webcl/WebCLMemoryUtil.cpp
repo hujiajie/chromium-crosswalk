@@ -74,7 +74,9 @@ void WebCLMemoryUtil::ensureMemory(WebCLMemoryObject* memoryObject, WebCLCommand
         m_kernelChar = WebCLKernel::create(clKernelId, m_context, m_program);
     }
 
-    unsigned count = memoryObject->sizeInBytes() / 16;
+    size_t sizeInBytes;
+    memoryObject->getInfo(CL_MEM_SIZE, sizeInBytes);
+    unsigned count = sizeInBytes / 16;
     if (count) {
         m_kernelChar16->setArg(0, memoryObject, es);
         if (es.hadException())
@@ -92,7 +94,7 @@ void WebCLMemoryUtil::ensureMemory(WebCLMemoryObject* memoryObject, WebCLCommand
         commandQueue->enqueueNDRangeKernel(m_kernelChar16.get(), globalWorkSize.size(), globalWorkOffset, globalWorkSize, localWorkSize, Vector<RefPtr<WebCLEvent>>(), nullptr, es);
     }
 
-    unsigned remainingBytes = memoryObject->sizeInBytes() % 16;
+    unsigned remainingBytes = sizeInBytes % 16;
     if (remainingBytes) {
         m_kernelChar->setArg(0, memoryObject, es);
         if (es.hadException())
@@ -103,7 +105,7 @@ void WebCLMemoryUtil::ensureMemory(WebCLMemoryObject* memoryObject, WebCLCommand
         if (es.hadException())
             return;
 
-        unsigned totalSize = memoryObject->sizeInBytes();
+        unsigned totalSize = sizeInBytes;
         m_kernelChar->setArg(2, sizeof(unsigned), &totalSize, es);
         if (es.hadException())
             return;

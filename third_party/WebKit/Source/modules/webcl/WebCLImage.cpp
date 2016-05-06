@@ -35,16 +35,11 @@ void WebCLImage::getInfo(ExceptionState& es, WebCLImageDescriptor& descriptor)
 }
 
 WebCLImage::WebCLImage(cl_mem image, const WebCLImageDescriptor& imageDescriptor, PassRefPtr<WebCLContext> context)
-    : WebCLMemoryObject(image, 0, context)
+    : WebCLMemoryObject(image, context)
     , m_imageDescriptor(imageDescriptor)
 {
-    size_t memorySizeValue = 0;
-    cl_int err = clGetMemObjectInfo(image, CL_MEM_SIZE, sizeof(size_t), &memorySizeValue, nullptr);
-    if (err == CL_SUCCESS)
-        m_sizeInBytes = memorySizeValue;
-
     size_t actualRowPitch = 0;
-    err = clGetImageInfo(image, CL_IMAGE_ROW_PITCH, sizeof(size_t), &actualRowPitch, nullptr);
+    cl_int err = clGetImageInfo(image, CL_IMAGE_ROW_PITCH, sizeof(size_t), &actualRowPitch, nullptr);
     if (err == CL_SUCCESS)
         m_imageDescriptor.setRowPitch(actualRowPitch);
 }
