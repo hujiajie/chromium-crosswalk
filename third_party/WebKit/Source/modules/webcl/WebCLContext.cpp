@@ -727,6 +727,16 @@ bool WebCLContext::isExtensionEnabled(const String& name) const
     return m_enabledExtensions.contains(name);
 }
 
+void WebCLContext::setDevices(const Vector<RefPtr<WebCLDevice>>& deviceList)
+{
+    m_devices = deviceList;
+}
+
+WebCLHTMLUtil* WebCLContext::getHTMLUtil() const
+{
+    return m_HTMLUtil.get();
+}
+
 Vector<RefPtr<WebCLDevice>> WebCLContext::devices()
 {
     ASSERT(!isReleased());

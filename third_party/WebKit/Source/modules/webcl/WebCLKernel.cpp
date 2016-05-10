@@ -418,6 +418,11 @@ unsigned WebCLKernel::associatedArguments()
     return count;
 }
 
+const Vector<unsigned>& WebCLKernel::requiredArguments()
+{
+    return m_argumentInfoProvider->requiredArguments();
+}
+
 int WebCLKernel::getInfo(unsigned name, String& info)
 {
     ASSERT(!isReleased());

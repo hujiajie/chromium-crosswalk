@@ -142,10 +142,18 @@ WebCLHTMLUtil::WebCLHTMLUtil(unsigned capacity)
 {
 }
 
+WebCLHTMLUtil::~WebCLHTMLUtil()
+{
+}
+
 WebCLHTMLUtil::ImageBufferCache::ImageBufferCache(unsigned capacity)
     : m_capacity(capacity)
 {
     m_buffers.reserveCapacity(capacity);
+}
+
+WebCLHTMLUtil::ImageBufferCache::~ImageBufferCache()
+{
 }
 
 // Get the imageBuffer with the same size as input argument, and swtich it to front for reusing.

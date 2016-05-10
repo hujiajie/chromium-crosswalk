@@ -23,6 +23,7 @@ class IntSize;
 class WebCLHTMLUtil {
 public:
     explicit WebCLHTMLUtil(unsigned capacity = 4);
+    ~WebCLHTMLUtil();
     static bool extractDataFromCanvas(HTMLCanvasElement*, Vector<uint8_t>& data, size_t& canvasSize, ExceptionState&);
     static bool extractDataFromImage(HTMLImageElement*, Vector<uint8_t>& data, size_t& canvasSize, ExceptionState&);
     static bool extractDataFromImageData(ImageData*, void*& hostPtr, size_t& pixelSize, ExceptionState&);
@@ -34,6 +35,7 @@ private:
     class ImageBufferCache {
         public:
             ImageBufferCache(unsigned capacity);
+            ~ImageBufferCache();
             ImageBuffer* imageBuffer(const IntSize&);
         private:
             Vector<OwnPtr<ImageBuffer>> m_buffers;

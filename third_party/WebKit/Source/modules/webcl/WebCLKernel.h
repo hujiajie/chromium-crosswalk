@@ -46,7 +46,7 @@ public:
     void release() override;
 
     unsigned associatedArguments();
-    const Vector<unsigned>& requiredArguments() { return m_argumentInfoProvider->requiredArguments(); }
+    const Vector<unsigned>& requiredArguments();
     cl_kernel getKernel() const { return m_clKernel; }
 
     template<typename T>
