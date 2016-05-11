@@ -5,13 +5,15 @@
 
 #include "modules/webcl/WebCLContext.h"
 
-#include "bindings/core/v8/V8Binding.h"
-#include "bindings/modules/v8/V8WebCLDevice.h"
+#include "bindings/core/v8/ExceptionState.h"
+#include "bindings/core/v8/ScriptState.h"
+#include "bindings/core/v8/ToV8.h"
+#include "core/dom/DOMArrayBuffer.h"
+#include "core/dom/DOMArrayBufferView.h"
 #include "core/html/HTMLCanvasElement.h"
 #include "core/html/HTMLImageElement.h"
 #include "core/html/HTMLVideoElement.h"
 #include "core/html/ImageData.h"
-#include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLBuffer.h"
 #include "modules/webcl/WebCLCommandQueue.h"
@@ -20,14 +22,12 @@
 #include "modules/webcl/WebCLImage.h"
 #include "modules/webcl/WebCLImageDescriptor.h"
 #include "modules/webcl/WebCLInputChecker.h"
-#include "modules/webcl/WebCLKernel.h"
-#include "modules/webcl/WebCLMemoryObject.h"
 #include "modules/webcl/WebCLMemoryUtil.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLProgram.h"
 #include "modules/webcl/WebCLSampler.h"
 #include "modules/webcl/WebCLUserEvent.h"
-#include "platform/graphics/Image.h"
-#include "platform/graphics/ImageBuffer.h"
+#include <string.h>
 
 namespace blink {
 

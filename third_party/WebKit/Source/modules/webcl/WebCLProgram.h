@@ -6,23 +6,24 @@
 #ifndef WebCLProgram_h
 #define WebCLProgram_h
 
+#include "bindings/core/v8/ScriptValue.h"
+#include "bindings/core/v8/ScriptWrappable.h"
 #include "core/webcl/WebCLException.h"
-#include "modules/webcl/WebCLCallback.h"
-#include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLDevice.h"
 #include "modules/webcl/WebCLObject.h"
 #include "modules/webcl/WebCLOpenCL.h"
+#include "platform/heap/Handle.h"
+#include "wtf/PassOwnPtr.h"
 #include "wtf/PassRefPtr.h"
-#include "wtf/RefCounted.h"
 #include "wtf/RefPtr.h"
-#include "wtf/Threading.h"
 #include "wtf/Vector.h"
 #include "wtf/text/WTFString.h"
 
 namespace blink {
 
 class ExceptionState;
-class WebCL;
+class ScriptState;
+class WebCLCallback;
 class WebCLContext;
 class WebCLKernel;
 class WebCLProgramHolder;

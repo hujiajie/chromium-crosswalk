@@ -5,10 +5,11 @@
 
 #include "modules/webcl/WebCLDevice.h"
 
-#include "bindings/modules/v8/V8WebCLPlatform.h"
-#include "core/webcl/WebCLException.h"
-#include "modules/webcl/WebCL.h"
-#include "modules/webcl/WebCLContext.h"
+#include "bindings/core/v8/ExceptionState.h"
+#include "bindings/core/v8/ScriptState.h"
+#include "bindings/core/v8/ToV8.h"
+#include "bindings/core/v8/V8Binding.h"
+#include "modules/webcl/WebCLInputChecker.h"
 #include "modules/webcl/WebCLPlatform.h"
 
 namespace blink {

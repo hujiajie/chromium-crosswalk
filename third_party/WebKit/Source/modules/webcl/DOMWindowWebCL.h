@@ -6,13 +6,15 @@
 #define DOMWindowWebCL_h
 
 #include "core/frame/DOMWindowProperty.h"
+#include "modules/webcl/WebCL.h"
 #include "platform/Supplementable.h"
+#include "platform/heap/Handle.h"
+#include "wtf/RefPtr.h"
 
 namespace blink {
 
 class DOMWindow;
 class LocalDOMWindow;
-class WebCL;
 
 class DOMWindowWebCL final : public GarbageCollectedFinalized<DOMWindowWebCL>, public HeapSupplement<LocalDOMWindow>, public DOMWindowProperty {
     USING_GARBAGE_COLLECTED_MIXIN(DOMWindowWebCL);
