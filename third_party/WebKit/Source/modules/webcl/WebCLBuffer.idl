@@ -4,6 +4,9 @@
 
 typedef unsigned long CLuint;
 typedef unsigned long CLenum;
-interface WebCLBuffer : WebCLMemoryObject {
+
+[
+    ImplementedAs=WebCLBufferAdaptor,
+] interface WebCLBuffer : WebCLMemoryObject {
     [RaisesException] WebCLBuffer createSubBuffer(CLenum memFlags, CLuint origin, CLuint sizeInBytes);
 };

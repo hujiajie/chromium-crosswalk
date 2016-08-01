@@ -31,7 +31,6 @@
 #include "core/dom/DOMException.h"
 #include "core/dom/ExceptionCode.h"
 #include "core/webcl/WebCLException.h"
-#include "wtf/RefPtr.h"
 
 namespace blink {
 
@@ -129,7 +128,7 @@ v8::Local<v8::Value> V8ThrowException::createWebCLException(v8::Isolate* isolate
 
     v8::TryCatch tryCatch(isolate);
 
-    RefPtr<WebCLException> webclException = WebCLException::create(ec, name, message);
+    WebCLException* webclException = WebCLException::create(ec, name, message);
     v8::Local<v8::Value> exception = toV8(webclException, creationContext, isolate);
 
     if (tryCatch.HasCaught()) {

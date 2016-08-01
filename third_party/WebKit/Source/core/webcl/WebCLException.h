@@ -8,18 +8,18 @@
 
 #include "bindings/core/v8/ExceptionState.h"
 #include "bindings/core/v8/ScriptWrappable.h"
-#include "wtf/ThreadSafeRefCounted.h"
+#include "platform/heap/Handle.h"
 
 #define WEBCLEXCEPTIONOFFSET 0
 
 namespace blink {
 
-class CORE_EXPORT WebCLException final : public ThreadSafeRefCounted<WebCLException>, public ScriptWrappable {
+class CORE_EXPORT WebCLException final : public GarbageCollectedFinalized<WebCLException>, public ScriptWrappable {
     DEFINE_WRAPPERTYPEINFO();
 public:
-    static PassRefPtr<WebCLException> create(unsigned code, const String& name, const String& message)
+    static WebCLException* create(unsigned code, const String& name, const String& message)
     {
-        return adoptRef(new WebCLException(code, name, message));
+        return new WebCLException(code, name, message);
     }
 
     enum WebCLExceptionCode {
@@ -133,14 +133,16 @@ public:
 
     static void throwException(int& code, ExceptionState&);
     unsigned code() const { return m_code; }
-    String name() const { return m_name.isolatedCopy(); }
-    String message() const { return m_message.isolatedCopy(); }
+    String name() const { return m_name; }
+    String message() const { return m_message; }
+
+    DEFINE_INLINE_TRACE() { }
 
 private:
     WebCLException(unsigned code, const String& name, const String& message)
         : m_code(code)
-        , m_name(name.isolatedCopy())
-        , m_message(message.isolatedCopy())
+        , m_name(name)
+        , m_message(message)
     {
     }
     unsigned m_code;

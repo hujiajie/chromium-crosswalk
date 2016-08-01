@@ -7,8 +7,10 @@
 #define WebCLCommandQueue_h
 
 #include "modules/webcl/WebCLCallback.h"
+#include "modules/webcl/WebCLCommandQueueAdaptor.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 #include "wtf/Threading.h"
@@ -33,8 +35,7 @@ class WebCLMemoryObject;
 class WebCLProgram;
 class WebCLSampler;
 
-class WebCLCommandQueue : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLCommandQueue : public WebCLObject, public WebCLScriptWrappable<WebCLCommandQueue> {
 public:
     ~WebCLCommandQueue() override;
     static PassRefPtr<WebCLCommandQueue> create(cl_command_queue, PassRefPtr<WebCLContext>, WebCLDevice*);

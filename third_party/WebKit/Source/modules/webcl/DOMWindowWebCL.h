@@ -13,12 +13,14 @@ namespace blink {
 class DOMWindow;
 class LocalDOMWindow;
 class WebCL;
+class WebCLAdaptor;
 
 class DOMWindowWebCL final : public GarbageCollectedFinalized<DOMWindowWebCL>, public Supplement<LocalDOMWindow>, public DOMWindowProperty {
     USING_GARBAGE_COLLECTED_MIXIN(DOMWindowWebCL);
 public:
     static DOMWindowWebCL& from(LocalDOMWindow&);
-    static WebCL* webcl(DOMWindow&);
+    static WebCLAdaptor* webcl(DOMWindow&);
+    ~DOMWindowWebCL();
 
     void willDestroyGlobalObjectInFrame() override;
     void willDetachGlobalObjectFromFrame() override;

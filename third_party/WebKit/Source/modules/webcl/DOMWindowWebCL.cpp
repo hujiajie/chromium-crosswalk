@@ -8,12 +8,17 @@
 #include "core/frame/LocalDOMWindow.h"
 #include "core/page/Page.h"
 #include "modules/webcl/WebCL.h"
+#include "modules/webcl/WebCLAdaptor.h"
 
 namespace blink {
 
 DOMWindowWebCL::DOMWindowWebCL(LocalDOMWindow& window)
     : DOMWindowProperty(window.frame())
     , m_window(&window)
+{
+}
+
+DOMWindowWebCL::~DOMWindowWebCL()
 {
 }
 
@@ -47,9 +52,12 @@ void DOMWindowWebCL::willDetachGlobalObjectFromFrame()
     DOMWindowProperty::willDetachGlobalObjectFromFrame();
 }
 
-WebCL* DOMWindowWebCL::webcl(DOMWindow& window)
+WebCLAdaptor* DOMWindowWebCL::webcl(DOMWindow& window)
 {
-    return from(toLocalDOMWindow(window)).webcl();
+    WebCL* impl = from(toLocalDOMWindow(window)).webcl();
+    if (!impl)
+        return nullptr;
+    return impl->toWebCLAdaptor();
 }
 
 WebCL* DOMWindowWebCL::webcl()

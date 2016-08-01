@@ -8,6 +8,8 @@
 
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLSamplerAdaptor.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -16,8 +18,7 @@ namespace blink {
 class ExceptionState;
 class WebCL;
 
-class WebCLSampler : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLSampler : public WebCLObject, public WebCLScriptWrappable<WebCLSampler> {
 public:
     ~WebCLSampler() override;
     static PassRefPtr<WebCLSampler> create(cl_sampler, bool, unsigned, unsigned, PassRefPtr<WebCLContext>);

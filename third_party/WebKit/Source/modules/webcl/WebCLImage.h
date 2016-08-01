@@ -7,6 +7,7 @@
 #define WebCLImage_h
 
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLImageAdaptor.h"
 #include "modules/webcl/WebCLImageDescriptor.h"
 #include "modules/webcl/WebCLMemoryObject.h"
 #include "wtf/PassRefPtr.h"
@@ -18,7 +19,6 @@ class ExceptionState;
 class WebCL;
 
 class WebCLImage : public WebCLMemoryObject {
-    DEFINE_WRAPPERTYPEINFO();
 public:
     ~WebCLImage() override;
     static PassRefPtr<WebCLImage> create(cl_mem, const WebCLImageDescriptor&, PassRefPtr<WebCLContext>);

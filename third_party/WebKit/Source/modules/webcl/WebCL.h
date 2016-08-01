@@ -6,6 +6,7 @@
 #ifndef WebCL_h
 #define WebCL_h
 
+#include "modules/webcl/WebCLAdaptor.h"
 #include "modules/webcl/WebCLCallback.h"
 #include "modules/webcl/WebCLCommandQueue.h"
 #include "modules/webcl/WebCLConfig.h"
@@ -21,6 +22,7 @@
 #include "modules/webcl/WebCLPlatform.h"
 #include "modules/webcl/WebCLProgram.h"
 #include "modules/webcl/WebCLSampler.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/OwnPtr.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
@@ -36,8 +38,7 @@ class ExceptionState;
 class ExecutionContext;
 class WebCLHolder;
 
-class WebCL final : public RefCounted<WebCL>, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCL final : public RefCounted<WebCL>, public WebCLScriptWrappable<WebCL> {
 public:
     ~WebCL();
     static PassRefPtr<WebCL> create();

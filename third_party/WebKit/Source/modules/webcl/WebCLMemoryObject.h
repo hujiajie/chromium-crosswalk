@@ -7,7 +7,9 @@
 #define WebCLMemoryObject_h
 
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLMemoryObjectAdaptor.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -17,8 +19,7 @@ class ExceptionState;
 class WebCL;
 class WebCLContext;
 
-class WebCLMemoryObject : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLMemoryObject : public WebCLObject, public WebCLScriptWrappable<WebCLMemoryObject> {
 public:
     enum {
         Memory,

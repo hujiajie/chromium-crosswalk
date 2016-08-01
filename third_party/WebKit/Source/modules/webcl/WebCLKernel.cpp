@@ -174,14 +174,14 @@ void WebCLKernel::setArg(unsigned index, const ScriptValue& value, ExceptionStat
     v8::Handle<v8::Value> object(value.v8Value());
     if (V8WebCLMemoryObject::hasInstance(object, isolate)) {
         WebCLMemoryObject* memoryObject;
-        memoryObject = V8WebCLMemoryObject::toImplWithTypeCheck(isolate, object);
+        memoryObject = V8WebCLMemoryObject::toImplWithTypeCheck(isolate, object)->toWebCLImpl();
         setArg(index, memoryObject, es);
         return;
     }
 
     if (V8WebCLSampler::hasInstance(object, isolate)) {
         WebCLSampler* sampler;
-        sampler = V8WebCLSampler::toImplWithTypeCheck(isolate, object);
+        sampler = V8WebCLSampler::toImplWithTypeCheck(isolate, object)->toWebCLImpl();
         setArg(index, sampler, es);
         return;
     }

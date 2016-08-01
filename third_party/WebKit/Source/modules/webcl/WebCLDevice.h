@@ -7,8 +7,10 @@
 #define WebCLDevice_h
 
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLDeviceAdaptor.h"
 #include "modules/webcl/WebCLExtension.h"
 #include "modules/webcl/WebCLPlatform.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -19,8 +21,7 @@ class WebCL;
 class WebCLGetInfo;
 class WebCLPlatform;
 
-class WebCLDevice final : public RefCounted<WebCLDevice>, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLDevice final : public RefCounted<WebCLDevice>, public WebCLScriptWrappable<WebCLDevice> {
 public:
     ~WebCLDevice();
     static PassRefPtr<WebCLDevice> create(cl_device_id);

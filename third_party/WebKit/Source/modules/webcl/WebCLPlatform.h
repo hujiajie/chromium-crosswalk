@@ -9,6 +9,8 @@
 #include "modules/webcl/WebCL.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLExtension.h"
+#include "modules/webcl/WebCLPlatformAdaptor.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -18,8 +20,7 @@ class ExceptionState;
 class WebCLCommandQueue;
 class WebCLImage;
 
-class WebCLPlatform final : public RefCounted<WebCLPlatform>, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLPlatform final : public RefCounted<WebCLPlatform>, public WebCLScriptWrappable<WebCLPlatform> {
 public:
     ~WebCLPlatform();
     static PassRefPtr<WebCLPlatform> create(cl_platform_id);

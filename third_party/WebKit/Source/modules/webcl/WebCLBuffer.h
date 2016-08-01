@@ -6,6 +6,7 @@
 #ifndef WebCLBuffer_h
 #define WebCLBuffer_h
 
+#include "modules/webcl/WebCLBufferAdaptor.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLMemoryObject.h"
 
@@ -15,7 +16,6 @@ class WebCL;
 class WebCLContext;
 
 class WebCLBuffer : public WebCLMemoryObject {
-    DEFINE_WRAPPERTYPEINFO();
 public:
     ~WebCLBuffer() override;
     static PassRefPtr<WebCLBuffer> create(PassRefPtr<WebCLContext>, unsigned, unsigned, void*, ExceptionState&);

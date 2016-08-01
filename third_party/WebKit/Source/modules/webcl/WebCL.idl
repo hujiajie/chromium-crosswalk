@@ -11,7 +11,9 @@ typedef unsigned long CLenum; // Used for enumerated types, such as WebCL.DEVICE
 
 [
     NoInterfaceObject,
-    DoNotCheckConstants
+    DoNotCheckConstants,
+    GarbageCollected,
+    ImplementedAs=WebCLAdaptor,
 ] interface WebCL {
     /* Error Codes */
     const CLint   SUCCESS                                  = 0;

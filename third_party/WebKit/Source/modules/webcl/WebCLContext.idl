@@ -5,7 +5,11 @@
 typedef unsigned long CLenum;
 typedef unsigned long CLuint;
 typedef boolean CLboolean;
-interface WebCLContext {
+
+[
+    GarbageCollected,
+    ImplementedAs=WebCLContextAdaptor,
+] interface WebCLContext {
     [RaisesException] WebCLBuffer createBuffer(CLenum memFlags, ImageData hostPtr);
     [RaisesException] WebCLBuffer createBuffer(CLenum memFlags, HTMLCanvasElement hostPtr);
     [RaisesException] WebCLBuffer createBuffer(CLenum memFlags, HTMLImageElement hostPtr);

@@ -5,6 +5,8 @@
 
 typedef long CLint;
 
-interface WebCLUserEvent : WebCLEvent {
+[
+    ImplementedAs=WebCLUserEventAdaptor,
+] interface WebCLUserEvent : WebCLEvent {
     [RaisesException] void setStatus(CLint executionStatus);
 };

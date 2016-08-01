@@ -9,6 +9,7 @@
 #include "bindings/modules/v8/V8WebCLMemoryObject.h"
 #include "core/webcl/WebCLException.h"
 #include "modules/webcl/WebCL.h"
+#include "modules/webcl/WebCLBuffer.h"
 #include "modules/webcl/WebCLOpenCL.h"
 
 namespace blink {
@@ -66,7 +67,7 @@ ScriptValue WebCLMemoryObject::getInfo(ScriptState* scriptState, int paramName, 
         return ScriptValue(scriptState, toV8(context(), creationContext, isolate));
     case CL_MEM_ASSOCIATED_MEMOBJECT:
         if (m_parentMemObject)
-            return ScriptValue(scriptState, toV8(m_parentMemObject, creationContext, isolate));
+            return ScriptValue(scriptState, toV8(static_cast<WebCLBuffer*>(m_parentMemObject), creationContext, isolate));
         return ScriptValue(scriptState, v8::Null(isolate));
     default:
         es.throwWebCLException(WebCLException::InvalidValue, WebCLException::invalidValueMessage);

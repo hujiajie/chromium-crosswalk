@@ -3,7 +3,11 @@
 // found in the LICENSE file.
 
 typedef unsigned long CLenum;
-interface WebCLSampler {
+
+[
+    GarbageCollected,
+    ImplementedAs=WebCLSamplerAdaptor,
+] interface WebCLSampler {
     [CallWith=ScriptState, RaisesException] any getInfo(CLenum name);
     void release();
 };

@@ -6,8 +6,10 @@
 #ifndef WebCLKernel_h
 #define WebCLKernel_h
 
+#include "modules/webcl/WebCLKernelAdaptor.h"
 #include "modules/webcl/WebCLKernelArgInfoProvider.h"
 #include "modules/webcl/WebCLProgram.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -23,8 +25,7 @@ class WebCLMemoryObject;
 class WebCLPlatform;
 class WebCLSampler;
 
-class WebCLKernel : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLKernel : public WebCLObject, public WebCLScriptWrappable<WebCLKernel> {
 public:
     ~WebCLKernel() override;
     static PassRefPtr<WebCLKernel> create(cl_kernel, PassRefPtr<WebCLContext>, WebCLProgram*, const String&);

@@ -8,6 +8,7 @@
 
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLEvent.h"
+#include "modules/webcl/WebCLUserEventAdaptor.h"
 #include "wtf/PassRefPtr.h"
 
 namespace blink {
@@ -15,7 +16,6 @@ namespace blink {
 class WebCLContext;
 
 class WebCLUserEvent : public WebCLEvent {
-    DEFINE_WRAPPERTYPEINFO();
 public:
     ~WebCLUserEvent() override;
     static PassRefPtr<WebCLUserEvent> create(PassRefPtr<WebCLContext>, ExceptionState&);

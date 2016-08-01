@@ -7,12 +7,13 @@
 #define WebCLKernelArgInfo_h
 
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLKernelArgInfoAdaptor.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/RefCounted.h"
 
 namespace blink {
 
-class WebCLKernelArgInfo final : public RefCounted<WebCLKernelArgInfo>, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLKernelArgInfo final : public RefCounted<WebCLKernelArgInfo>, public WebCLScriptWrappable<WebCLKernelArgInfo> {
 public:
     enum {
         Char,

@@ -8,7 +8,9 @@
 
 #include "modules/webcl/WebCLCallback.h"
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLEventAdaptor.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 
@@ -19,8 +21,7 @@ class WebCLCommandQueue;
 class WebCLEventHolder;
 class ExceptionState;
 
-class WebCLEvent : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLEvent : public WebCLObject, public WebCLScriptWrappable<WebCLEvent> {
 public:
     ~WebCLEvent() override;
     static PassRefPtr<WebCLEvent> create();

@@ -9,6 +9,8 @@
 #include "modules/webcl/WebCLCallback.h"
 #include "modules/webcl/WebCLConfig.h"
 #include "modules/webcl/WebCLObject.h"
+#include "modules/webcl/WebCLProgramAdaptor.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 #include "wtf/Threading.h"
@@ -22,8 +24,7 @@ class WebCLDevice;
 class WebCLKernel;
 class WebCLProgramHolder;
 
-class WebCLProgram : public WebCLObject, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLProgram : public WebCLObject, public WebCLScriptWrappable<WebCLProgram> {
 public:
     ~WebCLProgram() override;
     static PassRefPtr<WebCLProgram> create(cl_program, PassRefPtr<WebCLContext>, const String&);

@@ -8,7 +8,9 @@
 
 #include "bindings/core/v8/Nullable.h"
 #include "modules/webcl/WebCLConfig.h"
+#include "modules/webcl/WebCLContextAdaptor.h"
 #include "modules/webcl/WebCLDevice.h"
+#include "modules/webcl/WebCLScriptWrappable.h"
 #include "wtf/PassRefPtr.h"
 #include "wtf/RefCounted.h"
 #include "wtf/RefPtr.h"
@@ -36,8 +38,7 @@ class WebCLProgram;
 class WebCLSampler;
 class WebCLUserEvent;
 
-class WebCLContext final : public RefCounted<WebCLContext>, public ScriptWrappable {
-    DEFINE_WRAPPERTYPEINFO();
+class WebCLContext final : public RefCounted<WebCLContext>, public WebCLScriptWrappable<WebCLContext> {
 public:
     ~WebCLContext();
     static PassRefPtr<WebCLContext> create(cl_context, WebCL*, const Vector<RefPtr<WebCLDevice>>&, HashSet<String>&);
